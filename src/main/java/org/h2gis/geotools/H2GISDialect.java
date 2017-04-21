@@ -630,4 +630,6 @@ public class H2GISDialect extends BasicSQLDialect {
         return new String[]{"TABLE", "VIEW", "MATERIALIZED VIEW", "SYNONYM", "TABLE LINK", "EXTERNAL"};
     }
     
+    
+    
 }
