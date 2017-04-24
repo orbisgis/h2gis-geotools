@@ -50,7 +50,7 @@ public class H2DataStoreFactoryTest  {
     @Before
     public void setUp() throws Exception {
         factory = new H2GISDataStoreFactory();
-        factory.setBaseDirectory(new File("./testH2"));
+        factory.setBaseDirectory(new File("./target/testH2"));
         params = new HashMap();
         params.put(JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test");
         params.put(JDBCDataStoreFactory.DATABASE.key, "h2gis");
