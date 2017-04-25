@@ -26,4 +26,27 @@ or add to your pom.xml:
         <version>0.1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
+
+
+## Example
+
+```java
+
+H2GISDataStoreFactory factory = new H2GISDataStoreFactory();
+factory.setBaseDirectory(new File("./target/testH2"));
+HashMap params = new HashMap();
+params.put(JDBCDataStoreFactory.NAMESPACE.key, "http://www.h2gis.org/test");
+params.put(JDBCDataStoreFactory.DATABASE.key, "mydatabase");
+params.put(JDBCDataStoreFactory.DBTYPE.key, "h2gis");
+JDBCDataStore ds = factory.createDataStore( params );
+Statement st = ds.getDataSource().getConnection().createStatement();
+st.execute("drop table if exists FORESTS");
+st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64), THE_GEOM MULTIPOLYGON);INSERT INTO FORESTS VALUES(109, 'Green Forest', ST_MPolyFromText( 'MULTIPOLYGON(((28 26,28 0,84 0,84 42,28 26), (52 18,66 23,73 9,48 6,52 18)),((59 18,67 18,67 13,59 13,59 18)))', 101));");
+
+SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("FORESTS");
+SimpleFeatureType schema = fs.getSchema();
+Query query = new Query(schema.getTypeName(), Filter.INCLUDE);
+
+System.out.println(fs.getCount(query));
+System.out.println(schema.getAttributeCount());
 ```
