@@ -26,7 +26,7 @@ or add to your pom.xml:
         <version>0.1.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
-
+```
 
 ## Example
 
