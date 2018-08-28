@@ -4,7 +4,8 @@ H2GIS Datastore for the geotools library
 
 ## Maven Nexus respository
 
-h2gis-geotools is available on the OrbisGIS's Maven repository at repo.orbisgis.org.
+h2gis-geotools is available on the OrbisGIS's Maven repository at repo.orbisgis.org. 
+
 
 You can get current project snapshot here:http://nexus.orbisgis.org/#view-repositories;osgi-maven-snapshot~browseindex
 
@@ -23,10 +24,12 @@ or add to your pom.xml:
     <dependency>
         <groupId>org.h2gis</groupId>
         <artifactId>h2gis-geotools</artifactId>
-        <version>0.1.0-SNAPSHOT</version>
+        <version>0.2.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
+The snapshot version is compatible with Geotools 19.X
+
 
 ## Example
 
