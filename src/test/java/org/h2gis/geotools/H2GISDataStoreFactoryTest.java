@@ -43,7 +43,7 @@ import org.junit.Test;
  * 
  *
  */
-public class H2DataStoreFactoryTest  {
+public class H2GISDataStoreFactoryTest  {
     H2GISDataStoreFactory factory;
     HashMap params;
     

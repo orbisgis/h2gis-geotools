@@ -36,7 +36,7 @@ import org.h2gis.utilities.JDBCUtilities;
 
 
 /**
- * DataStoreFacotry for H2GIS database.
+ * DataStoreFactory for H2GIS database.
  *
  * @author Nicolas Fortin
  * @author Erwan Bocher
@@ -208,9 +208,8 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
             throws IOException {
         //check the foreign keys parameter
         Boolean foreignKeys = (Boolean) ASSOCIATIONS.lookUp(params);
-
         if (foreignKeys != null) {
-            dataStore.setAssociations(foreignKeys.booleanValue());
+            dataStore.setAssociations(foreignKeys);
         }
 
         return dataStore;

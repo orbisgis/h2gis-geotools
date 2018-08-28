@@ -78,6 +78,7 @@ public class H2GISDialect extends BasicSQLDialect {
             put("MULTILINESTRING", MultiLineString.class);
             put("MULTIPOLYGON", MultiPolygon.class);
             put("GEOMETRYCOLLECTION", GeometryCollection.class);
+            
         }
     };
 
@@ -138,16 +139,6 @@ public class H2GISDialect extends BasicSQLDialect {
     }
     
 
-    @Override
-    public Geometry decodeGeometryValue(GeometryDescriptor descriptor,
-            ResultSet rs, String column, GeometryFactory factory, Connection cx)
-            throws IOException, SQLException {
-        Geometry geom = ValueGeometry.get(rs.getBytes(column)).getGeometry();
-        if (geom == null) {
-            return null;
-        }
-        return geom;
-    }    
     
 
     @Override
@@ -628,6 +619,15 @@ public class H2GISDialect extends BasicSQLDialect {
     @Override
     public String[] getDesiredTablesType() {
         return new String[]{"TABLE", "VIEW", "MATERIALIZED VIEW", "SYNONYM", "TABLE LINK", "EXTERNAL"};
+    }
+
+    @Override
+    public Geometry decodeGeometryValue(GeometryDescriptor gd, ResultSet rs, String column, GeometryFactory gf, Connection cnctn, Hints hints) throws IOException, SQLException {
+        Geometry geom = ValueGeometry.get(rs.getBytes(column)).getGeometry();
+        if (geom == null) {
+            return null;
+        }
+        return geom;
     }
     
     

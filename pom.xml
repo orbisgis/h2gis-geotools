@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.h2gis</groupId>
     <artifactId>h2gis-geotools</artifactId>
-    <version>0.1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>H2GIS Geotools driver</name>
     <description>
@@ -33,8 +33,8 @@
         <maven.compiler.source>1.7</maven.compiler.source>
         <maven.compiler.target>1.7</maven.compiler.target>
         <junit-version>4.11</junit-version>
-        <geotools-version>14.1</geotools-version>
-        <h2gis-version>1.3.1</h2gis-version>
+        <geotools-version>19.2</geotools-version>
+        <h2gis-version>1.3.2</h2gis-version>
     </properties>
     <scm>
                 <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
@@ -91,21 +91,18 @@
             <artifactId>h2gis-functions</artifactId>
             <version>${h2gis-version}</version>
             <scope>provided</scope>
-        </dependency>        
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-referencing</artifactId>
-            <version>${geotools-version}</version>
-        </dependency>
+        </dependency> 
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools-version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-extension</artifactId>
             <version>${geotools-version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <build>
