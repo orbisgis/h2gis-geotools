@@ -28,6 +28,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import static junit.framework.TestCase.assertNotNull;
+import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.simple.SimpleFeatureCollection;
@@ -35,18 +36,24 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.jdbc.SQLDialect;
 import org.geotools.jdbc.VirtualTable;
 import org.geotools.referencing.CRS;
+import org.h2gis.utilities.SFSUtilities;
+import org.h2gis.utilities.TableLocation;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
@@ -325,5 +332,25 @@ public class H2GISTest extends H2GISDBTestSetUp {
         Query query = new Query(schema.getTypeName(), Filter.INCLUDE);
         assertEquals(3, fs.getCount(query));
         st.execute("drop table LANDCOVER");
+    }
+    
+    @Test
+    public void updateGeometry_Columns() throws SQLException, IOException, SchemaException {        
+        SQLDialect dialect = factory.createSQLDialect(ds);
+        String schemaName = "PUBLIC";
+        st.execute("drop table if exists LANDCOVER");
+        st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
+                + " THE_GEOM POLYGON);"
+                + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
+                + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
+                + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
+ 
+        SimpleFeatureType newFS
+                = DataUtilities.createType("LANDCOVER", "FID:Integer,NAME:String,THE_GEOM:Polygon");
+
+        assertTrue((newFS.getGeometryDescriptor().getType().getBinding().equals(Polygon.class)));
+        dialect.postCreateTable(schemaName, newFS, ds.getDataSource().getConnection());       
+        assertEquals(0, SFSUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
+        
     }
 }
