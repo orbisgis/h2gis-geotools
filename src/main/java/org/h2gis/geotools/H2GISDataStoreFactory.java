@@ -66,7 +66,7 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
      * optional parameter to handle MVCC.
      * @link http://www.h2database.com/html/advanced.html#mvcc
      */
-    public static final Param MVCC = new Param("MVCC", Boolean.class, "MVCC", false, Boolean.FALSE);
+    public static final Param MVCC = new Param("MVCC", Boolean.class, "MVCC", false, null);
     
     /**
      * base location to store h2 database files

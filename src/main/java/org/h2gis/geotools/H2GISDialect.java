@@ -457,6 +457,9 @@ public class H2GISDialect extends BasicSQLDialect {
     /**
      * Creates GEOMETRY_COLUMN registrations and spatial indexes for all
      * geometry columns
+     * @param schemaName
+     * @param featureType
+     * @param cx
      * @throws java.sql.SQLException
      */
     @Override
@@ -476,7 +479,7 @@ public class H2GISDialect extends BasicSQLDialect {
                     GeometryDescriptor gd = (GeometryDescriptor) att;
 
                     // lookup or reverse engineer the srid
-                    int srid = -1;
+                    int srid = 0;
                     if (gd.getUserData().get(JDBCDataStore.JDBC_NATIVE_SRID) != null) {
                         srid = (Integer) gd.getUserData().get(
                                 JDBCDataStore.JDBC_NATIVE_SRID);
@@ -515,7 +518,11 @@ public class H2GISDialect extends BasicSQLDialect {
 
                     sql = "ALTER TABLE \"" + schemaName + "\".\"" + tableName + "\" "
                             + "ALTER COLUMN \"" + gd.getLocalName() + "\" "
-                            + "TYPE geometry (" + geomType + ", " + srid + ");";
+                             + geomType + "; "
+                            + "ALTER TABLE \""+ schemaName + "\".\"" + tableName + "\" "
+                            + "ADD CHECK ST_SRID( \"" + gd.getLocalName() + "\")= "+ srid+ ";";
+
+                   
 
                     LOGGER.fine(sql);
                     st.execute(sql);

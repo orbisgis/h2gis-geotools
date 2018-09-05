@@ -37,7 +37,7 @@ public abstract class H2GISDBTestSetUp {
     
     private static final String DB_NAME = "H2GISDBTest";
     
-    private H2GISDataStoreFactory factory;
+    public H2GISDataStoreFactory factory;
     private HashMap params;
     public JDBCDataStore ds;
     public WKTReader wKTReader;
@@ -74,5 +74,7 @@ public abstract class H2GISDBTestSetUp {
     public void tearDownDatabase() throws Exception {
         ds.getDataSource().getConnection().close();
     }   
+    
+    
     
 }
