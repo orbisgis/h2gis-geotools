@@ -335,7 +335,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     }
     
     @Test
-    public void createGeometryTable() throws SQLException, IOException, SchemaException {        
+    public void updateGeometry_Columns() throws SQLException, IOException, SchemaException {        
         SQLDialect dialect = factory.createSQLDialect(ds);
         String schemaName = "PUBLIC";
         st.execute("drop table if exists LANDCOVER");
