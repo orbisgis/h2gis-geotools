@@ -20,9 +20,9 @@
  */
 package org.h2gis.geotools;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.ParseException;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
