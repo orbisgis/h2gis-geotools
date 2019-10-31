@@ -71,22 +71,6 @@ public class H2GISDataStoreFactoryTest  {
         assertTrue(ds.getDataSource() instanceof ManageableDataSource);
     }
 
-    @Test
-    public void testCreateDataStoreMVCC() throws Exception {
-        Map clonedParams = new HashMap(params);
-        clonedParams.put(H2GISDataStoreFactory.MVCC.key, true);
-        JDBCDataStore ds = factory.createDataStore(clonedParams);
-        assertNotNull(ds);
-        final DataSource source = ds.getDataSource();
-        assertNotNull(source);
-        final DataSource wrapped = source.unwrap(DataSource.class);
-        assertNotNull(wrapped);
-        if (wrapped instanceof BasicDataSource) {
-            final BasicDataSource basicSource = (BasicDataSource) wrapped;
-            final String url = basicSource.getUrl();
-            assertTrue(url.contains("MVCC=true"));
-        }
-    } 
     
     //@Test Doesn't work yet
     public void testTCP() throws Exception {
