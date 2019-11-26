@@ -119,7 +119,12 @@
             <artifactId>h2gis</artifactId>
             <version>${h2gis-version}</version>
             <scope>provided</scope>
-        </dependency> 
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.197</version>
+        </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
