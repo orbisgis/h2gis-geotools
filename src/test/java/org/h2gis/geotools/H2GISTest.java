@@ -37,7 +37,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.JTS;
@@ -126,6 +125,23 @@ public class H2GISTest extends H2GISDBTestSetUp {
         assertEquals("NAME", schema.getDescriptor(1).getLocalName());
         assertEquals("THE_GEOM", schema.getDescriptor(2).getLocalName());
         st.execute("drop table FORESTS");
+    }
+    
+    @Test
+    public void getFeatureSchemaLinkedTable() throws SQLException, IOException {
+        st.execute("drop table if exists LANDCOVER_LINKED");
+        st.execute("CALL FILE_TABLE('" + H2GISTest.class.getResource("landcover.shp").getPath() + "', 'LANDCOVER_LINKED');");
+        
+        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER_LINKED");
+        SimpleFeatureType schema = fs.getSchema();
+        GeometryDescriptor geomDesc = schema.getGeometryDescriptor();        
+        assertEquals("THE_GEOM", geomDesc.getLocalName());
+        assertNotNull(geomDesc.getCoordinateReferenceSystem());
+        
+        ResultSet rs = st.executeQuery("SELECT ST_EXTENT(THE_GEOM) FROM LANDCOVER_LINKED");
+        rs.next(); 
+        assertTrue(JTS.toEnvelope(((Geometry) rs.getObject(1))).boundsEquals2D(fs.getBounds(), 0.01));
+        st.execute("drop table LANDCOVER_LINKED");
     }
 
     @Test
@@ -287,7 +303,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testWithCRS() throws Exception {
         st.execute("drop table if exists FORESTS");
         st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM GEOMETRY(MULTIPOLYGON));"
+                + " THE_GEOM GEOMETRY(MULTIPOLYGON, 4326));"
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', ST_MPolyFromText( 'MULTIPOLYGON(((28 26,28 0,84 0,"
                 + "84 42,28 26), (52 18,66 23,73 9,48 6,52 18)),((59 18,67 18,67 13,59 13,59 18)))', 4326));");
 

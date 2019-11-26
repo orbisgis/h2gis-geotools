@@ -73,8 +73,6 @@ public abstract class H2GISDBTestSetUp {
     @After
     public void tearDownDatabase() throws Exception {
         ds.getDataSource().getConnection().close();
-    }   
-    
-    
+    }
     
 }

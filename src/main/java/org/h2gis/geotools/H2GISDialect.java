@@ -54,6 +54,7 @@ import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.referencing.CRS;
 import org.h2.value.ValueGeometry;
 import org.h2gis.utilities.SFSUtilities;
+import org.h2gis.utilities.TableLocation;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
@@ -169,24 +170,21 @@ public class H2GISDialect extends BasicSQLDialect {
     @Override
     public void encodeGeometryEnvelope(String tableName, String geometryColumn,
             StringBuffer sql) {
-        sql.append("ST_AsText(");
-        sql.append("ST_Extent(\"").append(geometryColumn).append("\"::geometry))");
+        sql.append("ST_Extent(\"").append(geometryColumn).append("\")");
     }    
+    
+    
    
 
     @Override
     public Envelope decodeGeometryEnvelope(ResultSet rs, int column,
             Connection cx) throws SQLException, IOException {
-        try {
-            String envelope = rs.getString(column);
-            if (envelope != null)
-                return wKTReader.read(envelope).getEnvelopeInternal();
-            else
-                // empty one
-                return new Envelope();
-        } catch (ParseException e) {
-            throw new IOException(
-                    "Cannot create the bounding box", e);
+        Geometry envelope = (Geometry) rs.getObject(column);
+        if (envelope != null){
+            return envelope.getEnvelopeInternal();
+        }else{
+            // empty one
+            return new Envelope();
         }
     }
 
@@ -229,23 +227,14 @@ public class H2GISDialect extends BasicSQLDialect {
         int srid = 0;
         try {
             if (schemaName == null)
-                schemaName = "PUBLIC";
-                        
+                schemaName = "PUBLIC";                       
             
             // try geometry_columns
             try {
-                String sqlStatement = "SELECT SRID FROM GEOMETRY_COLUMNS WHERE " //
-                        + "F_TABLE_SCHEMA = '" + schemaName + "' " //
-                        + "AND F_TABLE_NAME = '" + tableName + "' " //
-                        + "AND F_GEOMETRY_COLUMN = '" + columnName + "'";
+                String sqlStatement = schemaName +"." +tableName;    
+                LOGGER.log(Level.FINE, "Geometry srid check; {0} ", sqlStatement);                
+                srid =  SFSUtilities.getSRID(cx, TableLocation.parse(sqlStatement), columnName);
     
-                LOGGER.log(Level.FINE, "Geometry srid check; {0} ", sqlStatement);
-                statement = cx.createStatement();
-                result = statement.executeQuery(sqlStatement);
-    
-                if (result.next()) {
-                    srid = result.getInt(1);
-                }
             } catch(SQLException e) {
                 LOGGER.log(Level.WARNING, "Failed to retrieve information about " 
                         + schemaName + "." + tableName + "."  + columnName 
