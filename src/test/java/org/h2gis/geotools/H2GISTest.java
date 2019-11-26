@@ -37,7 +37,6 @@ import org.geotools.data.simple.SimpleFeatureSource;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.SchemaException;
-import org.geotools.feature.type.GeometryDescriptorImpl;
 import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.JTS;
@@ -126,6 +125,20 @@ public class H2GISTest extends H2GISDBTestSetUp {
         assertEquals("NAME", schema.getDescriptor(1).getLocalName());
         assertEquals("THE_GEOM", schema.getDescriptor(2).getLocalName());
         st.execute("drop table FORESTS");
+    }
+    
+    @Test
+    public void getFeatureSchemaLinkedTable() throws SQLException, IOException {
+        st.execute("drop table if exists LANDCOVER");
+        st.execute("CALL FILE_TABLE('" + H2GISTest.class.getResource("landcover.shp").getPath() + "', 'LANDCOVER');");
+
+        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER");
+        SimpleFeatureType schema = fs.getSchema();
+        GeometryDescriptor geomDesc = schema.getGeometryDescriptor();        
+        assertEquals("THE_GEOM", geomDesc.getLocalName());
+        assertNotNull(geomDesc.getCoordinateReferenceSystem());
+        System.out.println(fs.getBounds());
+        st.execute("drop table LANDCOVER");
     }
 
     @Test
