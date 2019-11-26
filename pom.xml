@@ -22,8 +22,8 @@
     </licenses>
     <parent>
         <groupId>org.orbisgis</groupId>
-        <artifactId>orbisgis-nexus</artifactId>
-        <version>2</version>
+        <artifactId>orbisparent</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <properties>
