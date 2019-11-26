@@ -170,7 +170,7 @@ public class H2GISDialect extends BasicSQLDialect {
     @Override
     public void encodeGeometryEnvelope(String tableName, String geometryColumn,
             StringBuffer sql) {
-        sql.append("ST_Extent(\"").append(geometryColumn).append("\"::geometry)");
+        sql.append("ST_Extent(\"").append(geometryColumn).append("\")");
     }    
     
     
