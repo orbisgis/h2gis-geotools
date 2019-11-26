@@ -87,7 +87,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
         st.execute("DROP TABLE IF EXISTS h2gis.geomtable; COMMIT;");
 
         String sql = "CREATE TABLE h2gis.geomtable (id int AUTO_INCREMENT(1) PRIMARY KEY, "
-                + "the_geom POINT)";
+                + "the_geom GEOMETRY(POINT))";
         st.execute(sql);
 
         sql = "INSERT INTO h2gis.geomtable VALUES ("
@@ -103,7 +103,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
         rs = st.executeQuery("select * from h2gis.geomtable;");
         rs.next();
         assertTrue(rs.getInt(1) == 0);
-        assertEquals("POINT (12 0)", rs.getString(2));
+        assertEquals("SRID=4326;POINT (12 0)", rs.getString(2));
         rs.close();
         st.execute("DROP TABLE h2gis.geomtable");
     }
@@ -112,7 +112,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getFeatureSchema() throws SQLException, IOException {
         st.execute("drop table if exists FORESTS");
         st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM MULTIPOLYGON);"
+                + " THE_GEOM GEOMETRY(MULTIPOLYGON));"
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', ST_MPolyFromText( 'MULTIPOLYGON(((28 26,28 0,84 0,"
                 + "84 42,28 26), (52 18,66 23,73 9,48 6,52 18)),((59 18,67 18,67 13,59 13,59 18)))', 101));");
 
@@ -132,7 +132,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getBoundingBox() throws SQLException, IOException, ParseException {
         st.execute("drop table if exists FORESTS");
         st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', 'POLYGON((0 0,10 0,10 10, 0 10, 0 0))');");
 
         SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("FORESTS");
@@ -152,7 +152,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getFeatures() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -183,7 +183,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getFeaturesFilter() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -201,7 +201,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getFeaturesFilter2() throws SQLException, IOException, CQLException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -220,7 +220,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void getFeaturesFilter3() throws SQLException, IOException, CQLException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, CODE INTEGER,"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, -1, 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 3, 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, -1, 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -237,7 +237,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testBboxFilter() throws SQLException, IOException, CQLException, ParseException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POINT);"
+                + " THE_GEOM GEOMETRY(POINT));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POINT(5 5)');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POINT(200 220)');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POINT(90 130)');");
@@ -254,7 +254,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testIntersectsFilter() throws Exception {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POINT);"
+                + " THE_GEOM GEOMETRY(POINT));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POINT(5 5)');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POINT(200 220)');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POINT(90 130)');");
@@ -271,7 +271,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testNoCRS() throws Exception {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -287,7 +287,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testWithCRS() throws Exception {
         st.execute("drop table if exists FORESTS");
         st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM MULTIPOLYGON);"
+                + " THE_GEOM GEOMETRY(MULTIPOLYGON));"
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', ST_MPolyFromText( 'MULTIPOLYGON(((28 26,28 0,84 0,"
                 + "84 42,28 26), (52 18,66 23,73 9,48 6,52 18)),((59 18,67 18,67 13,59 13,59 18)))', 4326));");
 
@@ -303,7 +303,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
     public void testVirtualTable() throws SQLException, IOException, ParseException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -340,7 +340,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
         String schemaName = "PUBLIC";
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
-                + " THE_GEOM POLYGON);"
+                + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
@@ -348,7 +348,7 @@ public class H2GISTest extends H2GISDBTestSetUp {
         SimpleFeatureType newFS
                 = DataUtilities.createType("LANDCOVER", "FID:Integer,NAME:String,THE_GEOM:Polygon");
 
-        assertTrue((newFS.getGeometryDescriptor().getType().getBinding().equals(Polygon.class)));
+        assertEquals(newFS.getGeometryDescriptor().getType().getBinding(), Polygon.class);
         dialect.postCreateTable(schemaName, newFS, ds.getDataSource().getConnection());       
         assertEquals(0, SFSUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
         

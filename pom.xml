@@ -34,7 +34,6 @@
         <maven.compiler.target>1.7</maven.compiler.target>
         <junit-version>4.11</junit-version>
         <geotools-version>21.1</geotools-version>
-        <h2gis-version>1.5.0</h2gis-version>
     </properties>
     <scm>
                 <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
@@ -117,13 +116,7 @@
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>h2gis</artifactId>
-            <version>${h2gis-version}</version>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.4.197</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
