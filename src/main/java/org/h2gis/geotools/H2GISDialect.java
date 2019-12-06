@@ -507,7 +507,7 @@ public class H2GISDialect extends BasicSQLDialect {
 
                     sql = "ALTER TABLE \"" + schemaName + "\".\"" + tableName + "\" "
                             + "ALTER COLUMN \"" + gd.getLocalName() + "\" "
-                             + "GEOMETRY(" + geomType + "); "
+                            + geomType + "); "
                             + "ALTER TABLE \""+ schemaName + "\".\"" + tableName + "\" "
                             + "ADD CHECK ST_SRID( \"" + gd.getLocalName() + "\")= "+ srid+ ";";
 
