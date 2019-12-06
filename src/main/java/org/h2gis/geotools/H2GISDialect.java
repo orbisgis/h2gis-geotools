@@ -505,10 +505,7 @@ public class H2GISDialect extends BasicSQLDialect {
                         throw new IllegalArgumentException("H2GIS only supports geometries with 2 and 3 dimensions, current value: " + dimensions);
                     }
 
-                    sql = "ALTER TABLE \"" + schemaName + "\".\"" + tableName + "\" "
-                            + "ALTER COLUMN \"" + gd.getLocalName() + "\" "
-                            + geomType + "); "
-                            + "ALTER TABLE \""+ schemaName + "\".\"" + tableName + "\" "
+                    sql = "ALTER TABLE \""+ schemaName + "\".\"" + tableName + "\" "
                             + "ADD CHECK ST_SRID( \"" + gd.getLocalName() + "\")= "+ srid+ ";";
 
                    
