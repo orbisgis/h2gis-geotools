@@ -20,32 +20,27 @@
  */
 package org.h2gis.geotools;
 
-import java.io.File;
-import java.util.Collections;
-import java.util.HashMap;
-import static junit.framework.TestCase.fail;
-import org.geotools.data.DataStore;
 import org.geotools.data.jdbc.datasource.ManageableDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
-import org.h2.tools.Server;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import java.io.File;
+import java.util.Collections;
+import java.util.HashMap;
 
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * 
  *
  */
 public class H2GISDataStoreFactoryTest  {
-    H2GISDataStoreFactory factory;
-    HashMap params;
+    private static H2GISDataStoreFactory factory;
+    private static HashMap params;
     
-    @Before
-    public void setUp() throws Exception {
+    @BeforeAll
+    static void setUp() {
         factory = new H2GISDataStoreFactory();
         factory.setBaseDirectory(new File("./target/testH2"));
         params = new HashMap();
@@ -56,20 +51,20 @@ public class H2GISDataStoreFactoryTest  {
     }
 
     @Test
-    public void testCanProcess() throws Exception {
+    void testCanProcess() {
         assertFalse(factory.canProcess(Collections.EMPTY_MAP));
         assertTrue(factory.canProcess(params));
     }
     
     @Test
-    public void testCreateDataStore() throws Exception {
+    void testCreateDataStore() throws Exception {
         JDBCDataStore ds = factory.createDataStore( params );
         assertNotNull( ds );
         assertTrue(ds.getDataSource() instanceof ManageableDataSource);
     }
 
     
-    //@Test Doesn't work yet
+    /*@Test Doesn't work yet
     public void testTCP() throws Exception {
         HashMap params = new HashMap();
         params.put(H2GISDataStoreFactory.HOST.key, "localhost");
@@ -97,5 +92,5 @@ public class H2GISDataStoreFactoryTest  {
         finally {
             server.shutdown();
         }
-    }
+    }*/
 }
