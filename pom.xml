@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.h2gis</groupId>
     <artifactId>h2gis-geotools</artifactId>
@@ -10,8 +11,8 @@
         DataStore for H2GIS Database.
     </description>
     <organization>
-         <name>Lab-STICC - UMR CNRS 6285</name>
-         <url>http://www.labsticc.fr/</url>
+        <name>Lab-STICC - UMR CNRS 6285</name>
+        <url>http://www.labsticc.fr/</url>
     </organization>
     <url>http://www.h2gis.org</url>
     <licenses>
@@ -28,17 +29,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
-        <maven-jar-plugin-version>2.4</maven-jar-plugin-version>
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
-        <junit-version>4.11</junit-version>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <geotools-version>21.1</geotools-version>
     </properties>
     <scm>
-                <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
-                <developerConnection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</developerConnection>
-                <url>git@github.com:orbisgis/h2gis-geotools.git</url>
+        <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
+        <developerConnection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</developerConnection>
+        <url>git@github.com:orbisgis/h2gis-geotools.git</url>
     </scm>
     <developers>
         <developer>
@@ -90,13 +88,15 @@
             </releases>
         </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit-version}</version>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -132,35 +132,32 @@
         </dependency>
     </dependencies>
     <build>
-                <plugins>
-                        <plugin>
-                                <artifactId>maven-compiler-plugin</artifactId>
-                                <version>${maven-compiler-plugin-version}</version>
-                                <configuration>
-                                        <source>${maven.compiler.source}</source>
-                                        <target>${maven.compiler.target}</target>
-                                </configuration>
-                        </plugin>
-                        <plugin>
-                                <groupId>org.apache.maven.plugins</groupId>
-                                <artifactId>maven-jar-plugin</artifactId>
-                                <version>${maven-jar-plugin-version}</version>
-                                <configuration>
-                                        <archive>
-                                                <manifest>
-                                                        <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                                                </manifest>
-                                                <manifestEntries>
-                                                        <Specification-Vendor-URL>${project.organization.url}</Specification-Vendor-URL>
-                                                        <Specification-URL>${project.url}</Specification-URL>
-                                                </manifestEntries>
-                                        </archive>
-                                </configuration>
-                        </plugin>
-                        <plugin>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${maven.compiler.source}</source>
+                    <target>${maven.compiler.target}</target>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Vendor-URL>${project.organization.url}</Specification-Vendor-URL>
+                            <Specification-URL>${project.url}</Specification-URL>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.5.1</version>
                 <executions>
                     <execution>
                         <!-- Copy priority level bundles (log) -->
@@ -178,9 +175,9 @@
                             <includeScope>provided</includeScope>
                             <excludeArtifactIds>slf4j-api</excludeArtifactIds>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
-                        </plugin>
-                </plugins>
-</build>
+            </plugin>
+        </plugins>
+    </build>
 </project>
