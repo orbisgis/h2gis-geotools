@@ -69,18 +69,29 @@ public class H2GISDialect extends BasicSQLDialect {
             put("GEOMETRY", Geometry.class);
             put("POINT", Point.class);
             put("POINTM", Point.class);
+            put("POINTZ", Point.class);
+            put("POINTZM", Point.class);
             put("LINESTRING", LineString.class);
             put("LINESTRINGM", LineString.class);
+            put("LINESTRINGZ", LineString.class);
+            put("LINESTRINGZM", LineString.class);
             put("POLYGON", Polygon.class);
             put("POLYGONM", Polygon.class);
+            put("POLYGONZ", Polygon.class);
+            put("POLYGONZM", Polygon.class);
             put("MULTIPOINT", MultiPoint.class);
             put("MULTIPOINTM", MultiPoint.class);
+            put("MULTIPOINTZ", MultiPoint.class);
+            put("MULTIPOINTZM", MultiPoint.class);
             put("MULTILINESTRING", MultiLineString.class);
             put("MULTILINESTRINGM", MultiLineString.class);
+            put("MULTILINESTRINGZ", MultiLineString.class);
+            put("MULTILINESTRINGZM", MultiLineString.class);
             put("MULTIPOLYGON", MultiPolygon.class);
             put("MULTIPOLYGONM", MultiPolygon.class);
+            put("MULTIPOLYGONZ", MultiPolygon.class);
+            put("MULTIPOLYGONZM", MultiPolygon.class);
             put("GEOMETRYCOLLECTION", GeometryCollection.class);
-            put("GEOMETRYCOLLECTIONM", GeometryCollection.class);
             put("BYTEA", byte[].class);
         }
     };
@@ -651,8 +662,8 @@ public class H2GISDialect extends BasicSQLDialect {
                 savePoint = cx.setSavepoint();
             }
 
-            for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
-                if (att instanceof GeometryDescriptor) {
+                for (AttributeDescriptor att : featureType.getAttributeDescriptors()) {
+                    if (att instanceof GeometryDescriptor) {
                     // use estimated extent (optimizer statistics)
                     Envelope env = GeometryTableUtilities.getEstimatedExtent(cx, tableLocation, att.getName().getLocalPart()).getEnvelopeInternal();
                     // reproject and merge
@@ -680,4 +691,5 @@ public class H2GISDialect extends BasicSQLDialect {
         }
         return result;
     }
+
 }
