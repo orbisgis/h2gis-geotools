@@ -27,15 +27,11 @@
         <version>1.0.3-SNAPSHOT</version>
     </parent>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven-compiler-plugin-version>2.3.2</maven-compiler-plugin-version>
-        <maven-jar-plugin-version>2.4</maven-jar-plugin-version>
+    <properties>        
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
-        <junit-version>4.11</junit-version>
         <geotools-version>23.2</geotools-version>
-        <h2gis-version>1.5.0</h2gis-version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
@@ -114,7 +110,6 @@
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>h2gis</artifactId>
-            <version>${h2gis-version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
@@ -132,28 +127,28 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>${maven-compiler-plugin-version}</version>
-                <configuration>
-                    <source>${maven.compiler.source}</source>
-                    <target>${maven.compiler.target}</target>
-                </configuration>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>${maven-jar-plugin-version}</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                        </manifest>
-                        <manifestEntries>
-                            <Specification-Vendor-URL>${project.organization.url}</Specification-Vendor-URL>
-                            <Specification-URL>${project.url}</Specification-URL>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

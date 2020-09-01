@@ -26,8 +26,6 @@ import java.net.URI;
 import java.util.HashMap;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
-import org.junit.After;
-import org.junit.Before;
 import org.locationtech.jts.io.WKTReader;
 
 /**

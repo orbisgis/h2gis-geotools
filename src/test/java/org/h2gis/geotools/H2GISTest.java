@@ -20,6 +20,7 @@
  */
 package org.h2gis.geotools;
 
+import org.h2gis.utilities.GeometryTableUtilities;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
@@ -44,7 +45,6 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.SQLDialect;
 import org.geotools.jdbc.VirtualTable;
 import org.geotools.referencing.CRS;
-import org.h2gis.utilities.SFSUtilities;
 import org.h2gis.utilities.TableLocation;
 import static org.junit.jupiter.api.Assertions.*;
 import org.opengis.feature.simple.SimpleFeature;
@@ -365,7 +365,6 @@ class H2GISTest extends H2GISDBTestSetUp {
 
         assertEquals(newFS.getGeometryDescriptor().getType().getBinding(), Polygon.class);
         dialect.postCreateTable(schemaName, newFS, ds.getDataSource().getConnection());       
-        assertEquals(0, SFSUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
-        
-    }
+        assertEquals(0, GeometryTableUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
+     }
 }
