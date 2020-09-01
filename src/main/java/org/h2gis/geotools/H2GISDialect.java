@@ -20,20 +20,6 @@
  */
 package org.h2gis.geotools;
 
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.LinearRing;
-import com.vividsolutions.jts.geom.MultiLineString;
-import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
-import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.io.ParseException;
-import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -48,19 +34,34 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 import org.geotools.data.jdbc.FilterToSQL;
-import org.geotools.factory.Hints;
+import org.geotools.util.factory.Hints;
 import org.geotools.jdbc.BasicSQLDialect;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.referencing.CRS;
+import org.geotools.util.Version;
 import org.h2.value.ValueGeometry;
 import org.h2gis.utilities.SFSUtilities;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryCollection;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.LinearRing;
+import org.locationtech.jts.geom.MultiLineString;
+import org.locationtech.jts.geom.MultiPoint;
+import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
+import org.locationtech.jts.io.WKTWriter;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 
 /**
  * 
- *
+ * H2GIS dialect
  * 
  */
 public class H2GISDialect extends BasicSQLDialect {
@@ -95,8 +96,7 @@ public class H2GISDialect extends BasicSQLDialect {
             put(GeometryCollection.class, "GEOMETRYCOLLECTION");
             put(LinearRing.class, "LINEARRING");
         }
-    };
-      
+    };      
     
     boolean functionEncodingEnabled = true;    
     
@@ -137,20 +137,11 @@ public class H2GISDialect extends BasicSQLDialect {
         } 
         return true;
     }
-    
 
-    
-
-    @Override
-    public void encodeGeometryColumn(GeometryDescriptor gatt, String prefix, int srid,
-            StringBuffer sql) {
-        encodeGeometryColumn(gatt, prefix, srid, null, sql);
-    }
 
     @Override
     public void encodeGeometryColumn(GeometryDescriptor gatt, String prefix, int srid, Hints hints,
             StringBuffer sql) {
-
         boolean force2D = hints != null && hints.containsKey(Hints.FEATURE_2D)
                 && Boolean.TRUE.equals(hints.get(Hints.FEATURE_2D));
 
@@ -450,7 +441,7 @@ public class H2GISDialect extends BasicSQLDialect {
 
     @Override
     public void encodePrimaryKey(String column, StringBuffer sql) {
-        encodeColumnName(column, sql);
+        encodeColumnName(null,column, sql);
         sql.append(" SERIAL PRIMARY KEY");
     }
 
@@ -636,7 +627,4 @@ public class H2GISDialect extends BasicSQLDialect {
         }
         return geom;
     }
-    
-    
-    
 }

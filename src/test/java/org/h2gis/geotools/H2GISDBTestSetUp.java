@@ -20,7 +20,6 @@
  */
 package org.h2gis.geotools;
 
-import com.vividsolutions.jts.io.WKTReader;
 import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
@@ -28,6 +27,7 @@ import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.junit.After;
 import org.junit.Before;
+import org.locationtech.jts.io.WKTReader;
 
 /**
  *
