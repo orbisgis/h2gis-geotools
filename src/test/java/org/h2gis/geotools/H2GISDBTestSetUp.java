@@ -20,6 +20,7 @@
  */
 package org.h2gis.geotools;
 
+
 import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
@@ -43,7 +44,6 @@ public abstract class H2GISDBTestSetUp {
     public WKTReader wKTReader;
     
 
-    @Before
     public void setDatabase() throws Exception {
         factory = new H2GISDataStoreFactory();
         factory.setBaseDirectory(new File(getDataBasePath(DB_NAME)));
@@ -62,7 +62,7 @@ public abstract class H2GISDBTestSetUp {
      * @param dbName
      * @return 
      */
-    private static String getDataBasePath(String dbName) {
+    private String getDataBasePath(String dbName) {
         if (dbName.startsWith("file://")) {
             return new File(URI.create(dbName)).getAbsolutePath();
         } else {
@@ -70,11 +70,8 @@ public abstract class H2GISDBTestSetUp {
         }
     }
 
-    @After
     public void tearDownDatabase() throws Exception {
         ds.getDataSource().getConnection().close();
-    }   
-    
-    
+    }
     
 }

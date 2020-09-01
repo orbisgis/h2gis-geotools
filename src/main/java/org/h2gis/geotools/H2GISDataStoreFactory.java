@@ -61,12 +61,16 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     /** optional port parameter */
     public static final Param PORT = new Param(JDBCDataStoreFactory.PORT.key, JDBCDataStoreFactory.PORT.type, 
             JDBCDataStoreFactory.PORT.description, false, 9902);
+    
+    /** optional parameter to access the same database without having to start the server manually */
+    public static final Param AUTO_SERVER =
+            new Param(
+                    "autoerver",
+                    Boolean.class,
+                    "Activate AUTO_SERVER mode to share the database access",
+                    false,
+                    true);
 
-    /**
-     * optional parameter to handle MVCC.
-     * @link http://www.h2database.com/html/advanced.html#mvcc
-     */
-    public static final Param MVCC = new Param("MVCC", Boolean.class, "MVCC", false, null);
     
     /**
      * base location to store h2 database files
@@ -112,6 +116,7 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
         //add additional parameters
         parameters.put(ASSOCIATIONS.key, ASSOCIATIONS);
         parameters.put(DBTYPE.key, DBTYPE);
+        parameters.put(AUTO_SERVER.key, AUTO_SERVER);
     }
 
     @Override
@@ -138,40 +143,43 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
         return new H2GISDialect(dataStore);
     }
-
+    
+    
     @Override
-    protected DataSource createDataSource(Map params, SQLDialect dialect) throws IOException {
+    protected String getJDBCUrl(Map params) throws IOException {
         String database = (String) DATABASE.lookUp(params);
         String host = (String) HOST.lookUp(params);
-        Boolean mvcc = (Boolean) MVCC.lookUp(params);
-        BasicDataSource dataSource = new BasicDataSource();
-        
+        Boolean autoServer = (Boolean) AUTO_SERVER.lookUp(params);
+        String autoServerSpec = Boolean.TRUE.equals(autoServer) ? ";AUTO_SERVER=TRUE" : "";
         if (host != null && !host.equals("")) {
             Integer port = (Integer) PORT.lookUp(params);
             if (port != null) {
-                dataSource.setUrl("jdbc:h2:tcp://" + host + ":" + port + "/" + database);
-            }
-            else {
-                dataSource.setUrl("jdbc:h2:tcp://" + host + "/" + database);
+                return "jdbc:h2:tcp://" + host + ":" + port + "/" + database;
+            } else {
+                return "jdbc:h2:tcp://" + host + "/" + database;
             }
         } else if (baseDirectory == null) {
-            //use current working directory
-            dataSource.setUrl("jdbc:h2:" + database + ";AUTO_SERVER=TRUE"
-                    + (mvcc != null ? (";MVCC=" + mvcc) : ""));
+            // use current working directory
+            return "jdbc:h2:" + database + autoServerSpec;
         } else {
-            //use directory specified if the patch is relative
+            // use directory specified if the patch is relative
             String location;
             if (!new File(database).isAbsolute()) {
-                location = new File(baseDirectory, database).getAbsolutePath();    
-            }
-            else {
+                location = new File(baseDirectory, database).getAbsolutePath();
+            } else {
                 location = database;
             }
 
-            dataSource.setUrl("jdbc:h2:file:" + location + ";AUTO_SERVER=TRUE"
-                    + (mvcc != null ? (";MVCC=" + mvcc) : ""));
+            return "jdbc:h2:file:"
+                    + location
+                    + autoServerSpec;
         }
-        
+    }
+
+    @Override
+    protected DataSource createDataSource(Map params, SQLDialect dialect) throws IOException {
+        BasicDataSource dataSource = new BasicDataSource();
+        dataSource.setUrl(getJDBCUrl(params));
         String username = (String) USER.lookUp(params);
         if (username != null) {
             dataSource.setUsername(username);
@@ -201,7 +209,8 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
         }  
 
         return new DBCPDataSource(dataSource);
-    }
+    }   
+    
 
     @Override
     protected JDBCDataStore createDataStoreInternal(JDBCDataStore dataStore, Map params)
@@ -219,8 +228,5 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     protected String getValidationQuery() {
         return "select now()";
     }  
-    
-    
-    
 
 }

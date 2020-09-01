@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.h2gis</groupId>
     <artifactId>h2gis-geotools</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>H2GIS Geotools driver</name>
     <description>
@@ -22,8 +23,8 @@
     </licenses>
     <parent>
         <groupId>org.orbisgis</groupId>
-        <artifactId>orbisgis-nexus</artifactId>
-        <version>2</version>
+        <artifactId>orbisparent</artifactId>
+        <version>1.0.3-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -47,7 +48,7 @@
             <organization>LAB-STICC CNRS UMR 6285</organization>
         </developer>
     </developers>
-    <repositories>    
+    <repositories>
         <repository>
             <id>osgeo</id>
             <name>OSGeo Release Repository</name>
@@ -74,18 +75,45 @@
             <name>Maven2 repository 2</name>
             <url>http://repo2.maven.org/maven2</url>
         </repository>
+        <repository>
+            <id>orbisgis-release</id>
+            <url>http://nexus-ng.orbisgis.org/repository/orbisgis-release</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>orbisgis-snapshot</id>
+            <url>http://nexus-ng.orbisgis.org/repository/orbisgis-snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
     </repositories>
-    
+
     <dependencies>
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>${junit-version}</version>
-            <scope>test</scope>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-jdbc</artifactId>
+            <version>${geotools-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-metadata</artifactId>
             <version>${geotools-version}</version>
         </dependency>
         <dependency>
@@ -97,8 +125,7 @@
             <groupId>org.orbisgis</groupId>
             <artifactId>h2gis</artifactId>
             <version>${h2gis-version}</version>
-            <scope>provided</scope>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
@@ -141,7 +168,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.5.1</version>
                 <executions>
                     <execution>
                         <!-- Copy priority level bundles (log) -->
@@ -154,13 +180,12 @@
                             <overWriteReleases>false</overWriteReleases>
                             <overWriteSnapshots>true</overWriteSnapshots>
                             <overWriteIfNewer>true</overWriteIfNewer>
-                            <transitive>true</transitive>
                             <excludeTransitive>false</excludeTransitive>
                             <stripVersion>true</stripVersion>
                             <includeScope>provided</includeScope>
                             <excludeArtifactIds>slf4j-api</excludeArtifactIds>
                         </configuration>
-                    </execution>                    
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
