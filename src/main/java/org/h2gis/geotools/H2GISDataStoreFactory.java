@@ -66,7 +66,7 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     /** optional parameter to access the same database without having to start the server manually */
     public static final Param AUTO_SERVER =
             new Param(
-                    "autoerver",
+                    "autoserver",
                     Boolean.class,
                     "Activate AUTO_SERVER mode to share the database access",
                     false,
