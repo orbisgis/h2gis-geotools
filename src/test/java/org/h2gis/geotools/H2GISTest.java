@@ -20,9 +20,9 @@
  */
 package org.h2gis.geotools;
 
+import org.h2gis.utilities.GeometryTableUtilities;
 import org.junit.jupiter.api.*;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
+import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -44,12 +44,15 @@ import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.jdbc.SQLDialect;
 import org.geotools.jdbc.VirtualTable;
 import org.geotools.referencing.CRS;
-import org.h2gis.utilities.SFSUtilities;
 import org.h2gis.utilities.TableLocation;
 import static org.junit.jupiter.api.Assertions.*;
+
+import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
+import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
@@ -125,20 +128,20 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals("THE_GEOM", schema.getDescriptor(2).getLocalName());
         st.execute("drop table FORESTS");
     }
-    
+
     @Test
     void getFeatureSchemaLinkedTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER_LINKED");
         st.execute("CALL FILE_TABLE('" + H2GISTest.class.getResource("landcover.shp").getPath() + "', 'LANDCOVER_LINKED');");
-        
+
         SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER_LINKED");
         SimpleFeatureType schema = fs.getSchema();
-        GeometryDescriptor geomDesc = schema.getGeometryDescriptor();        
+        GeometryDescriptor geomDesc = schema.getGeometryDescriptor();
         assertEquals("THE_GEOM", geomDesc.getLocalName());
         assertNotNull(geomDesc.getCoordinateReferenceSystem());
-        
+
         ResultSet rs = st.executeQuery("SELECT ST_EXTENT(THE_GEOM) FROM LANDCOVER_LINKED");
-        rs.next(); 
+        rs.next();
         assertTrue(JTS.toEnvelope(((Geometry) rs.getObject(1))).boundsEquals2D(fs.getBounds(), 0.01));
         st.execute("drop table LANDCOVER_LINKED");
     }
@@ -211,7 +214,7 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals(6L, value);
         st.execute("drop table LANDCOVER");
     }
-    
+
     @Test
     void getFeaturesFilter2() throws SQLException, IOException, CQLException {
         st.execute("drop table if exists LANDCOVER");
@@ -230,7 +233,7 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals(3L, value);
         st.execute("drop table LANDCOVER");
     }
-    
+
     @Test
     void getFeaturesFilter3() throws SQLException, IOException, CQLException {
         st.execute("drop table if exists LANDCOVER");
@@ -240,14 +243,14 @@ class H2GISTest extends H2GISDBTestSetUp {
                 + "INSERT INTO LANDCOVER VALUES(2, 3, 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, -1, 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
 
-        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER");        
-        Filter filter = CQL.toFilter("FID < abs(CODE)" );
+        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER");
+        Filter filter = CQL.toFilter("FID < abs(CODE)");
         SimpleFeatureCollection features = fs.getFeatures(filter);
         assertEquals(1, features.size());
         st.execute("drop table LANDCOVER");
     }
-    
-    
+
+
     @Test
     void testBboxFilter() throws SQLException, IOException, CQLException, ParseException {
         st.execute("drop table if exists LANDCOVER");
@@ -264,7 +267,7 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals(features[0].getDefaultGeometry(), wKTReader.read("POINT(5 5)"));
         st.execute("drop table LANDCOVER");
     }
-    
+
     @Test
     void testIntersectsFilter() throws Exception {
         st.execute("drop table if exists LANDCOVER");
@@ -279,9 +282,9 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals(1, fc.size());
         SimpleFeature[] features = (SimpleFeature[]) fc.toArray(new SimpleFeature[fc.size()]);
         assertEquals(features[0].getDefaultGeometry(), wKTReader.read("POINT(5 5)"));
-        st.execute("drop table LANDCOVER");       
+        st.execute("drop table LANDCOVER");
     }
-    
+
     @Test
     void testNoCRS() throws Exception {
         st.execute("drop table if exists LANDCOVER");
@@ -313,7 +316,7 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals("EPSG:4326", CRS.lookupIdentifier(crs, true));
         st.execute("drop table FORESTS");
     }
-    
+
     @Test
     void testVirtualTable() throws SQLException, IOException, ParseException {
         st.execute("drop table if exists LANDCOVER");
@@ -326,17 +329,17 @@ class H2GISTest extends H2GISDBTestSetUp {
         vTable.addGeometryMetadatata("THE_GEOM", Polygon.class, 4326);
         ds.createVirtualTable(vTable);
         SimpleFeatureType type = ds.getSchema("LANDCOVER_CEREAL");
-        assertNotNull(type);        
+        assertNotNull(type);
         assertNotNull(type.getGeometryDescriptor());
         FeatureSource fsView = ds.getFeatureSource("LANDCOVER_CEREAL");
         ReferencedEnvelope env = fsView.getBounds();
         assertNotNull(env);
         assertTrue(JTS.toEnvelope(wKTReader.read("POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))")).boundsEquals2D(env, 0.01));
-        ds.dropVirtualTable("LANDCOVER_CEREAL");        
+        ds.dropVirtualTable("LANDCOVER_CEREAL");
         st.execute("drop table LANDCOVER");
     }
-    
-    
+
+
     @Test
     void testH2GISFileTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER");
@@ -348,7 +351,7 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertEquals(3, fs.getCount(query));
         st.execute("drop table LANDCOVER");
     }
-    
+
     @Test
     void updateGeometry_Columns() throws SQLException, IOException, SchemaException {
         SQLDialect dialect = factory.createSQLDialect(ds);
@@ -359,13 +362,75 @@ class H2GISTest extends H2GISDBTestSetUp {
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
- 
+
         SimpleFeatureType newFS
                 = DataUtilities.createType("LANDCOVER", "FID:Integer,NAME:String,THE_GEOM:Polygon");
 
         assertEquals(newFS.getGeometryDescriptor().getType().getBinding(), Polygon.class);
-        dialect.postCreateTable(schemaName, newFS, ds.getDataSource().getConnection());       
-        assertEquals(0, SFSUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
-        
+        dialect.postCreateTable(schemaName, newFS, ds.getDataSource().getConnection());
+        assertEquals(0, GeometryTableUtilities.getSRID(ds.getDataSource().getConnection(), new TableLocation("LANDCOVER")));
+    }
+
+    @Test
+    void testGeometryTypes() throws SQLException, IOException {
+        String sql = "DROP TABLE IF EXISTS GEOMTYPES; CREATE TABLE GEOMTYPES(G GEOMETRY, G_S GEOMETRY(GEOMETRY, 1), P GEOMETRY(POINT), P_S GEOMETRY(POINT, 1),\n" +
+                "    PZ1 GEOMETRY(POINT Z), PZ2 GEOMETRY(POINTZ), PZ1_S GEOMETRY(POINT Z, 1), PZ2_S GEOMETRY(POINTZ, 1),\n" +
+                "    PM GEOMETRY(POINT M), PZM GEOMETRY(POINT ZM), PZM_S GEOMETRY(POINT ZM, -100),\n" +
+                "    LS GEOMETRY(LINESTRING), PG GEOMETRY(POLYGON),\n" +
+                "    MP GEOMETRY(MULTIPOINT), MLS GEOMETRY(MULTILINESTRING), MPG GEOMETRY(MULTIPOLYGON),\n" +
+                "    GC GEOMETRY(GEOMETRYCOLLECTION),PGZ GEOMETRY(POLYGONZ),PGM GEOMETRY(POLYGONM),PGZM GEOMETRY(POLYGONZM));\n" +
+                "INSERT INTO GEOMTYPES VALUES ('POINT EMPTY', 'SRID=1;POINT EMPTY', 'POINT EMPTY', 'SRID=1;POINT EMPTY',\n" +
+                "    'POINT Z EMPTY', 'POINT Z EMPTY', 'SRID=1;POINT Z EMPTY', 'SRID=1;POINTZ EMPTY',\n" +
+                "    'POINT M EMPTY', 'POINT ZM EMPTY', 'SRID=-100;POINT ZM EMPTY',\n" +
+                "    'LINESTRING EMPTY', 'POLYGON EMPTY',\n" +
+                "    'MULTIPOINT EMPTY', 'MULTILINESTRING EMPTY', 'MULTIPOLYGON EMPTY',\n" +
+                "    'GEOMETRYCOLLECTION EMPTY','POLYGON Z EMPTY','POLYGON M EMPTY','POLYGON ZM EMPTY');";
+        st.execute(sql);
+        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("GEOMTYPES");
+        SimpleFeatureType schema = fs.getSchema();
+        GeometryType geomType = (GeometryType) schema.getDescriptor("G").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Geometry.class));
+        geomType = (GeometryType) schema.getDescriptor("G_S").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Geometry.class));
+        geomType = (GeometryType) schema.getDescriptor("P").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("P_S").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZ1").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZ2").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZ1_S").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZ2_S").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PM").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZM").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("PZM_S").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Point.class));
+        geomType = (GeometryType) schema.getDescriptor("LS").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(LineString.class));
+        geomType = (GeometryType) schema.getDescriptor("LS").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(LineString.class));
+        geomType = (GeometryType) schema.getDescriptor("PG").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
+        geomType = (GeometryType) schema.getDescriptor("MLS").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(MultiLineString.class));
+        geomType = (GeometryType) schema.getDescriptor("MPG").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(MultiPolygon.class));
+        geomType = (GeometryType) schema.getDescriptor("MP").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(MultiPoint.class));
+        geomType = (GeometryType) schema.getDescriptor("MPG").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(MultiPolygon.class));
+        geomType = (GeometryType) schema.getDescriptor("PGZ").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
+        geomType = (GeometryType) schema.getDescriptor("PGM").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
+        geomType = (GeometryType) schema.getDescriptor("PGZM").getType();
+        assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
+
+
     }
 }

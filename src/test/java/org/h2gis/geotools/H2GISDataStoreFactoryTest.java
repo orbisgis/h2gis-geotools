@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -47,7 +48,6 @@ public class H2GISDataStoreFactoryTest  {
         params.put(JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test");
         params.put(JDBCDataStoreFactory.DATABASE.key, "h2gis");
         params.put(JDBCDataStoreFactory.DBTYPE.key, "h2gis");
-        
     }
 
     @Test
@@ -61,6 +61,16 @@ public class H2GISDataStoreFactoryTest  {
         JDBCDataStore ds = factory.createDataStore( params );
         assertNotNull( ds );
         assertTrue(ds.getDataSource() instanceof ManageableDataSource);
+    }
+
+    @Test
+    void testCreateH2GIS() throws Exception {
+        Map params = new java.util.HashMap();
+        params.put("database", new File("./target/testH2", "h2gis").getAbsolutePath());
+        params.put("dbtype", "h2gis");
+        H2GISDataStoreFactory ds = new H2GISDataStoreFactory();
+        ds.createDataStore(params);
+        assertNotNull( ds );
     }
 
     

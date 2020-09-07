@@ -33,6 +33,7 @@ import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 import org.h2gis.functions.factory.H2GISFunctions;
 import org.h2gis.utilities.JDBCUtilities;
+import org.h2gis.utilities.TableLocation;
 
 
 /**
@@ -65,7 +66,7 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     /** optional parameter to access the same database without having to start the server manually */
     public static final Param AUTO_SERVER =
             new Param(
-                    "autoerver",
+                    "autoserver",
                     Boolean.class,
                     "Activate AUTO_SERVER mode to share the database access",
                     false,
@@ -199,7 +200,7 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
         try {
             cx = dataSource.getConnection();
             //Add the spatial function
-            if (!JDBCUtilities.tableExists(cx, "PUBLIC.GEOMETRY_COLUMNS")) {
+            if (!JDBCUtilities.tableExists(cx, new TableLocation("GEOMETRY_COLUMNS"))) {
                 H2GISFunctions.load(cx);
             }
         } catch (SQLException e) {

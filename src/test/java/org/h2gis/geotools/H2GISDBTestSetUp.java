@@ -20,14 +20,13 @@
  */
 package org.h2gis.geotools;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.locationtech.jts.io.WKTReader;
+
 import java.io.File;
 import java.net.URI;
 import java.util.HashMap;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
+import org.locationtech.jts.io.WKTReader;
 
 /**
  *
