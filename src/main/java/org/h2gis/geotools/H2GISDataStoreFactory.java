@@ -25,12 +25,16 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sql.DataSource;
 import org.apache.commons.dbcp.BasicDataSource;
 import org.geotools.data.jdbc.datasource.DBCPDataSource;
 import org.geotools.jdbc.JDBCDataStore;
 import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
+import org.geotools.util.KVP;
+import org.geotools.util.logging.Logging;
 import org.h2gis.functions.factory.H2GISFunctions;
 import org.h2gis.utilities.JDBCUtilities;
 import org.h2gis.utilities.TableLocation;
@@ -44,6 +48,10 @@ import org.h2gis.utilities.TableLocation;
  *
  */
 public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
+    
+    
+    static final Logger LOGGER = Logging.getLogger(H2GISDataStoreFactory.class);
+    
     /** parameter for database type */
     public static final Param DBTYPE = new Param("dbtype", String.class, "Type", true, "h2gis");
     
@@ -71,7 +79,39 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
                     "Activate AUTO_SERVER mode to share the database access",
                     false,
                     true);
-
+    
+    /** parameter that enables estimated extends instead of exact ones */
+    public static final Param ESTIMATED_EXTENTS =
+            new Param(
+                    "Estimated extends",
+                    Boolean.class,
+                    "Use the spatial index information to quickly get an estimate of the data bounds",
+                    false,
+                    Boolean.TRUE);
+    
+    
+     /** Wheter a prepared statements based dialect should be used, or not */
+    public static final Param PREPARED_STATEMENTS =
+            new Param(
+                    "preparedStatements",
+                    Boolean.class,
+                    "Use prepared statements",
+                    false,
+                    Boolean.FALSE);
+    
+     /** Enables direct encoding of selected filter functions in sql */
+    public static final Param ENCODE_FUNCTIONS =
+            new Param(
+                    "encode functions",
+                    Boolean.class,
+                    "set to true to have a set of filter functions be translated directly in SQL. "
+                            + "Due to differences in the type systems the result might not be the same as evaluating "
+                            + "them in memory, including the SQL failing with errors while the in memory version works fine. "
+                            + "However this allows to push more of the filter into the database, increasing performance."
+                            + "the H2GIS table.",
+                    false,
+                    Boolean.TRUE,
+                    new KVP(Param.LEVEL, "advanced"));
     
     /**
      * base location to store h2 database files
@@ -98,26 +138,24 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     @Override
     protected void setupParameters(Map parameters) {
         super.setupParameters(parameters);
-
         //remove host and port temporarily in order to make username optional
         parameters.remove(JDBCDataStoreFactory.HOST.key);
-        parameters.remove(JDBCDataStoreFactory.PORT.key);
-        
+        parameters.remove(JDBCDataStoreFactory.PORT.key);        
         parameters.put(HOST.key, HOST);
         parameters.put(PORT.key, PORT);
-
         //remove user and password temporarily in order to make username optional
         parameters.remove(JDBCDataStoreFactory.USER.key);
-        parameters.remove(PASSWD.key);
-        
+        parameters.remove(PASSWD.key);        
         parameters.put(USER.key, USER);
-        parameters.put(PASSWD.key, PASSWD);
-        
+        parameters.put(PASSWD.key, PASSWD);        
         //add user 
         //add additional parameters
         parameters.put(ASSOCIATIONS.key, ASSOCIATIONS);
         parameters.put(DBTYPE.key, DBTYPE);
         parameters.put(AUTO_SERVER.key, AUTO_SERVER);
+        parameters.put(ESTIMATED_EXTENTS.key, ESTIMATED_EXTENTS);        
+        parameters.put(PREPARED_STATEMENTS.key, PREPARED_STATEMENTS);        
+        parameters.put(ENCODE_FUNCTIONS.key, ENCODE_FUNCTIONS);
     }
 
     @Override
@@ -141,10 +179,26 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     }
 
     @Override
-    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
-        return new H2GISDialect(dataStore);
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore, Map params) {
+        H2GISDialect dialect = new H2GISDialect(dataStore);
+        try {
+            if (Boolean.TRUE.equals(PREPARED_STATEMENTS.lookUp(params))) {
+                return new H2GISPSDialect(dataStore, dialect);
+            }
+        } catch (IOException e) {
+            if (LOGGER.isLoggable(Level.FINE))
+                LOGGER.log(
+                        Level.FINE,
+                        "Failed to lookup prepared statement parameter, continuining with non prepared dialect",
+                        e);
+        }        
+        return dialect;
     }
     
+    @Override
+    protected SQLDialect createSQLDialect(JDBCDataStore dataStore) {
+        return  new H2GISDialect(dataStore);
+    }
     
     @Override
     protected String getJDBCUrl(Map params) throws IOException {
@@ -216,10 +270,33 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     @Override
     protected JDBCDataStore createDataStoreInternal(JDBCDataStore dataStore, Map params)
             throws IOException {
+        // setup loose bbox
+        SQLDialect genericDialect = dataStore.getSQLDialect();
+        H2GISDialect dialect;
+        if (genericDialect instanceof H2GISPSDialect) {
+            dialect = ((H2GISPSDialect) genericDialect).getDelegate();
+        } else {
+            dialect = (H2GISDialect) dataStore.getSQLDialect();
+        }
+        
+         // check the estimated extents
+        Boolean estimated = (Boolean) ESTIMATED_EXTENTS.lookUp(params);
+        dialect.setEstimatedExtentsEnabled(estimated == null || Boolean.TRUE.equals(estimated));
+
         //check the foreign keys parameter
         Boolean foreignKeys = (Boolean) ASSOCIATIONS.lookUp(params);
         if (foreignKeys != null) {
             dataStore.setAssociations(foreignKeys);
+        }
+        
+         // check if we can encode functions in sql
+        Boolean encodeFunctions = (Boolean) ENCODE_FUNCTIONS.lookUp(params);
+        dialect.setFunctionEncodingEnabled(encodeFunctions == null || encodeFunctions);
+
+        // setup the ps dialect if need be
+        Boolean usePs = (Boolean) PREPARED_STATEMENTS.lookUp(params);
+        if (Boolean.TRUE.equals(usePs)) {
+            dataStore.setSQLDialect(new H2GISPSDialect(dataStore, dialect));
         }
 
         return dataStore;

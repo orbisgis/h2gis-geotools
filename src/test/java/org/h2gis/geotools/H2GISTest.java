@@ -20,6 +20,7 @@
  */
 package org.h2gis.geotools;
 
+import org.geotools.filter.text.ecql.ECQL;
 import org.h2gis.utilities.GeometryTableUtilities;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.geom.*;
@@ -56,6 +57,7 @@ import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
+import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Intersects;
@@ -162,7 +164,6 @@ class H2GISTest extends H2GISDBTestSetUp {
             bounds = collection.getBounds();
         }
         assertTrue(JTS.toEnvelope(wKTReader.read("POLYGON((0 0,10 0,10 10, 0 10, 0 0))")).boundsEquals2D(bounds, 0.01));
-
         st.execute("drop table FORESTS");
     }
 
@@ -349,6 +350,10 @@ class H2GISTest extends H2GISDBTestSetUp {
         SimpleFeatureType schema = fs.getSchema();
         Query query = new Query(schema.getTypeName(), Filter.INCLUDE);
         assertEquals(3, fs.getCount(query));
+        query = new Query(schema.getName().getLocalPart(), Filter.INCLUDE);
+        ReferencedEnvelope bounds = fs.getBounds(query);
+        assertNotNull(bounds);
+        assertEquals("ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0]", bounds.toString());
         st.execute("drop table LANDCOVER");
     }
 
@@ -430,7 +435,5 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
         geomType = (GeometryType) schema.getDescriptor("PGZM").getType();
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
-
-
     }
-}
+   }
