@@ -28,7 +28,7 @@ or add to your pom.xml:
     </dependency>
 </dependencies>
 ```
-The snapshot version is compatible with Geotools 19.X
+The snapshot version is compatible with Geotools 23.X
 
 
 ## Example
