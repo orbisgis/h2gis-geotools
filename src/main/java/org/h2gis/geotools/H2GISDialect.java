@@ -23,6 +23,7 @@ package org.h2gis.geotools;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.h2gis.utilities.GeometryMetaData;
 import org.h2gis.utilities.GeometryTableUtilities;
+import org.h2gis.utilities.dbtypes.DBTypes;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
@@ -229,7 +230,7 @@ public class H2GISDialect extends BasicSQLDialect {
         String gType = null;
         if ("geometry".equalsIgnoreCase(typeName)) {
             String columnName = columnMetaData.getString("COLUMN_NAME");
-            TableLocation tableLocation = new TableLocation(columnMetaData.getString("TABLE_SCHEM"), columnMetaData.getString("TABLE_NAME"));
+            TableLocation tableLocation = new TableLocation(null, columnMetaData.getString("TABLE_SCHEM"), columnMetaData.getString("TABLE_NAME"), DBTypes.H2GIS);
             GeometryMetaData geomMetata = GeometryTableUtilities.getMetaData(cx, tableLocation, columnName);
             if (geomMetata != null) {
                 gType = geomMetata.getGeometryType();
@@ -260,7 +261,7 @@ public class H2GISDialect extends BasicSQLDialect {
         if (schemaName == null) {
             schemaName = "PUBLIC";
         }
-        TableLocation tableLocation = TableLocation.parse(schemaName + "." + tableName, true);
+        TableLocation tableLocation = TableLocation.parse(schemaName + "." + tableName, DBTypes.H2GIS);
         try {
             // try geometry_columns
             try {
@@ -279,7 +280,7 @@ public class H2GISDialect extends BasicSQLDialect {
             // an unpredictable srid makes the table un-queriable)
             if (srid == 0) {
                 String sqlStatement = "SELECT ST_SRID(\"" + columnName + "\") "
-                        + "FROM " + tableLocation.toString(true)
+                        + "FROM " + tableLocation.toString()
                         + " WHERE \"" + columnName + "\" IS NOT NULL "
                         + "LIMIT 1";
                 statement = cx.createStatement();
@@ -492,7 +493,6 @@ public class H2GISDialect extends BasicSQLDialect {
             SimpleFeatureType featureType, Connection cx) throws SQLException {
         schemaName = schemaName != null ? schemaName : "PUBLIC";
         String tableName = featureType.getName().getLocalPart();
-
         Statement st = null;
         try {
             st = cx.createStatement();
@@ -649,7 +649,7 @@ public class H2GISDialect extends BasicSQLDialect {
         if (dataStore.getVirtualTables().get(tableName) != null) {
             return null;
         }
-        TableLocation tableLocation = new TableLocation(schema, tableName);
+        TableLocation tableLocation = new TableLocation(null, schema, tableName, DBTypes.H2GIS);
 
         List<ReferencedEnvelope> result = new ArrayList<ReferencedEnvelope>();
         Savepoint savePoint = null;

@@ -20,12 +20,13 @@
  */
 package org.h2gis.geotools;
 
-import org.geotools.filter.text.ecql.ECQL;
+import java.io.File;
 import org.h2gis.utilities.GeometryTableUtilities;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -48,16 +49,13 @@ import org.geotools.referencing.CRS;
 import org.h2gis.utilities.TableLocation;
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.opengis.feature.GeometryAttribute;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.feature.type.GeometryType;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 import org.opengis.filter.FilterFactory2;
-import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Intersects;
@@ -435,5 +433,59 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
         geomType = (GeometryType) schema.getDescriptor("PGZM").getType();
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
+    }
+    
+    
+      @Test
+      void testIterateFeatures() throws IOException, SQLException, CQLException {
+        String inputFile ="/home/ebocher/Autres/data/IGN/BD_parcellaire_ign_lrgf93/PARCELLE.SHP";
+        inputFile = "/home/ebocher/Autres/data/IGN/data_cadastre/parc_dgi/Parc_dgi.shp";
+        //inputFile = "/home/ebocher/Autres/data/DONNEES RENNES/Reseau_Rennes.shp";
+        //st.execute("drop table if exists PARCELS");
+        //st.execute("CALL FILE_TABLE('" + inputFile + "', 'PARCELS');");
+        //st.execute("DROP TABLE IF EXISTS output_table_test");
+        
+         st.execute("drop table if exists PARCELS");
+        st.execute("CREATE TABLE PARCELS ( FID INTEGER, NAME CHARACTER VARYING(64)"
+                + " );"
+                + "INSERT INTO PARCELS VALUES(1, 'Green Forest');"
+                + "INSERT INTO PARCELS VALUES(2, 'Cereal');"
+                + "INSERT INTO PARCELS VALUES(3, 'Building');");
+
+        long start = System.currentTimeMillis();
+         
+        SimpleFeatureSource fs =  ds.getFeatureSource("PARCELS");
+        SimpleFeatureCollection features =  fs.getFeatures();
+        SimpleFeatureIterator iterator = features.features();
+        try {
+            while (iterator.hasNext()) {
+                SimpleFeature feature = iterator.next();
+                System.out.println(feature.getAttribute("FID"));
+            }
+        } finally {
+            iterator.close(); // IMPORTANT
+        }
+
+        /*ds.createSchema(transformed.getSchema());
+        FeatureStore<SimpleFeatureType,SimpleFeature> featStore =
+                (FeatureStore<SimpleFeatureType,SimpleFeature>)ds.getFeatureSource("OUTPUT_TABLE_TEST_F");
+
+        featStore.addFeatures(simpleFeatureCollection);*/
+
+        long end = System.currentTimeMillis();
+        System.out.println("Times " + (end - start) / 1000);
+    }
+     
+     /**
+     * Generate a path for the database
+     * @param dbName
+     * @return 
+     */
+    private static String getDataBasePath(String dbName) {
+        if (dbName.startsWith("file://")) {
+            return new File(URI.create(dbName)).getAbsolutePath();
+        } else {
+            return new File("target/test-resources/" + dbName).getAbsolutePath();
+        }
     }
    }
