@@ -16,7 +16,7 @@ or add to your pom.xml:
     <repository>
         <id>OrbisGIS</id>
         <name>OrbisGIS repository</name>
-        <url>http://repo.orbisgis.org</url>
+        <url>http://nexus.orbisgis.org</url>
     </repository>
 </repositories>
 
