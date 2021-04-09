@@ -444,22 +444,27 @@ public class H2GISDialect extends BasicSQLDialect {
     public void registerSqlTypeNameToClassMappings(
             Map<String, Class<?>> mappings) {
         super.registerSqlTypeNameToClassMappings(mappings);
-
-        mappings.put("geometry", Geometry.class);
-        mappings.put("text", String.class);
-        mappings.put("int8", Long.class);
-        mappings.put("int4", Integer.class);
-        mappings.put("bool", Boolean.class);
-        mappings.put("character", String.class);
-        mappings.put("float8", Double.class);
-        mappings.put("int", Integer.class);
-        mappings.put("float4", Float.class);
-        mappings.put("int2", Short.class);
-        mappings.put("time", Time.class);
-        mappings.put("timestamp", Timestamp.class);
-        mappings.put("timestamptz", Timestamp.class);
-        mappings.put("uuid", UUID.class);
-        mappings.put("date", Date.class);
+        mappings.put("GEOMETRY", Geometry.class);
+        mappings.put("TEXT", String.class);
+        mappings.put("INT8", Long.class);
+        mappings.put("INT4", Integer.class);
+        mappings.put("BOOL", Boolean.class);
+        mappings.put("BIT", Boolean.class);
+        mappings.put("CHARACTER", String.class);
+        mappings.put("VARCHAR", String.class);
+        mappings.put("VARCHAR_IGNORECASE", String.class);
+        mappings.put("CHARACTER VARYING", String.class);
+        mappings.put("LONGVARCHAR", String.class);
+        mappings.put("FLOAT8", Double.class);
+        mappings.put("INT", Integer.class);
+        mappings.put("FLOAT4", Float.class);
+        mappings.put("REAL", Float.class);
+        mappings.put("INT2", Short.class);
+        mappings.put("TIME", Time.class);
+        mappings.put("TIMESTAMP", Timestamp.class);
+        mappings.put("UUID", UUID.class);
+        mappings.put("DATE", Date.class);
+        mappings.put("JSON", String.class);
     }
 
     @Override

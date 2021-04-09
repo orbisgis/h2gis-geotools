@@ -337,6 +337,27 @@ class H2GISTest extends H2GISDBTestSetUp {
         ds.dropVirtualTable("LANDCOVER_CEREAL");
         st.execute("drop table LANDCOVER");
     }
+    
+     @Test
+    void testVirtualTableFromSQL() throws SQLException, IOException, ParseException {
+        st.execute("drop table if exists LANDCOVER");
+        st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
+                + " THE_GEOM GEOMETRY(POLYGON));"
+                + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
+                + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
+                + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
+        VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER WHERE FID=2");        
+        ds.createVirtualTable(vTable);
+        SimpleFeatureType type = ds.getSchema("LANDCOVER_CEREAL");
+        assertNotNull(type);
+        assertNotNull(type.getGeometryDescriptor());
+        FeatureSource fsView = ds.getFeatureSource("LANDCOVER_CEREAL");
+        ReferencedEnvelope env = fsView.getBounds();
+        assertNotNull(env);
+        assertTrue(JTS.toEnvelope(wKTReader.read("POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))")).boundsEquals2D(env, 0.01));
+        ds.dropVirtualTable("LANDCOVER_CEREAL");
+        st.execute("drop table LANDCOVER");
+    }
 
 
     @Test
