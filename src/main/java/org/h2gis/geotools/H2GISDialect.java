@@ -550,9 +550,7 @@ public class H2GISDialect extends BasicSQLDialect {
                                 "H2GIS only supports geometries with 2 and 3 dimensions, current value: "
                                 + dimensions);
                     }
-                    
-                    //String geomField = TableLocation.capsIdentifier(gd.getLocalName(), DBTypes.H2);
-                    
+                     
                     sql
                             = "ALTER TABLE "
                             + tableName
