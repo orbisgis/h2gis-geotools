@@ -112,7 +112,7 @@ public class H2GISDialect extends BasicSQLDialect {
             put(GeometryCollection.class, "GEOMETRYCOLLECTION");
             put(LinearRing.class, "LINEARRING");
         }
-    };
+    };  
 
     boolean functionEncodingEnabled = true;
     //Since H2GIS 2.0
@@ -497,7 +497,8 @@ public class H2GISDialect extends BasicSQLDialect {
     public void postCreateTable(String schemaName,
             SimpleFeatureType featureType, Connection cx) throws SQLException {
         schemaName = schemaName != null ? schemaName : "PUBLIC";
-        String tableName = featureType.getName().getLocalPart();
+        String tableName = TableLocation.parse(schemaName+"."+featureType.getName().getLocalPart(), DBTypes.H2).toString();        
+        
         Statement st = null;
         try {
             st = cx.createStatement();
@@ -542,12 +543,28 @@ public class H2GISDialect extends BasicSQLDialect {
                     //setup the geometry type
                     if (dimensions == 3) {
                         geomType = geomType + "Z";
-                    } else if (dimensions > 3) {
-                        throw new IllegalArgumentException("H2GIS only supports geometries with 2 and 3 dimensions, current value: " + dimensions);
+                    } else if (dimensions == 4) {
+                        geomType = geomType + "ZM";
+                    } else if (dimensions > 4) {
+                        throw new IllegalArgumentException(
+                                "H2GIS only supports geometries with 2 and 3 dimensions, current value: "
+                                + dimensions);
                     }
-
-                    sql = "ALTER TABLE \"" + schemaName + "\".\"" + tableName + "\" "
-                            + "ADD CHECK ST_SRID( \"" + gd.getLocalName() + "\")= " + srid + ";";
+                    
+                    //String geomField = TableLocation.capsIdentifier(gd.getLocalName(), DBTypes.H2);
+                    
+                    sql
+                            = "ALTER TABLE "
+                            + tableName
+                            + " "
+                            + "ALTER COLUMN "
+                            + gd.getLocalName()
+                            + " "
+                            + "TYPE geometry ("
+                            + geomType
+                            + ", "
+                            + srid
+                            + ");";
                     LOGGER.fine(sql);
                     st.execute(sql);
                 }
@@ -746,5 +763,4 @@ public class H2GISDialect extends BasicSQLDialect {
         }
         return h2Version;
     }
-
 }

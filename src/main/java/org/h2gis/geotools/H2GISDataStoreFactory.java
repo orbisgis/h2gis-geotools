@@ -133,7 +133,8 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
      */
     public File getBaseDirectory() {
         return baseDirectory;
-    }
+    }    
+    
     
     @Override
     protected void setupParameters(Map parameters) {
