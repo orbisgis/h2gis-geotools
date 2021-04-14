@@ -453,18 +453,20 @@ class H2GISTest extends H2GISDBTestSetUp {
         geomType = (GeometryType) schema.getDescriptor("PGZM").getType();
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
     }
-    
-    /**
-     * Generate a path for the database
-     *
-     * @param dbName
-     * @return
-     */
-    private static String getDataBasePath(String dbName) {
-        if (dbName.startsWith("file://")) {
-            return new File(URI.create(dbName)).getAbsolutePath();
-        } else {
-            return new File("target/test-resources/" + dbName).getAbsolutePath();
-        }
+
+    @Test
+    void createSchema() throws SQLException, IOException, SchemaException {
+        String tableName = "mygeotable";
+        st.execute("DROP TABLE if exists \"" + tableName + "\"");
+        SimpleFeatureType schema = DataUtilities.createType(tableName, "geom:Point:srid=4326,id:Integer,name:String");
+        ds.createSchema(schema);
+        assertNotNull(ds.getSchema(schema.getName()));
+        assertNotNull(ds.getFeatureSource(tableName));        
+        tableName = "MYGEOTABLE";
+        st.execute("DROP TABLE if exists \"" + tableName + "\"");
+        schema = DataUtilities.createType(tableName, "geom:Point:srid=4326,id:Integer,name:String");
+        ds.createSchema(schema);
+        assertNotNull(ds.getSchema(schema.getName()));
+        assertNotNull(ds.getFeatureSource(tableName));
     }
 }
