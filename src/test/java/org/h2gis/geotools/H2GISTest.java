@@ -249,7 +249,6 @@ class H2GISTest extends H2GISDBTestSetUp {
         st.execute("drop table LANDCOVER");
     }
 
-
     @Test
     void testBboxFilter() throws SQLException, IOException, CQLException, ParseException {
         st.execute("drop table if exists LANDCOVER");
@@ -337,8 +336,8 @@ class H2GISTest extends H2GISDBTestSetUp {
         ds.dropVirtualTable("LANDCOVER_CEREAL");
         st.execute("drop table LANDCOVER");
     }
-    
-     @Test
+
+    @Test
     void testVirtualTableFromSQL() throws SQLException, IOException, ParseException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
@@ -346,7 +345,7 @@ class H2GISTest extends H2GISDBTestSetUp {
                 + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');"
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
-        VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER WHERE FID=2");        
+        VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER WHERE FID=2");
         ds.createVirtualTable(vTable);
         SimpleFeatureType type = ds.getSchema("LANDCOVER_CEREAL");
         assertNotNull(type);
@@ -358,7 +357,6 @@ class H2GISTest extends H2GISDBTestSetUp {
         ds.dropVirtualTable("LANDCOVER_CEREAL");
         st.execute("drop table LANDCOVER");
     }
-
 
     @Test
     void testH2GISFileTable() throws SQLException, IOException {
@@ -397,18 +395,18 @@ class H2GISTest extends H2GISDBTestSetUp {
 
     @Test
     void testGeometryTypes() throws SQLException, IOException {
-        String sql = "DROP TABLE IF EXISTS GEOMTYPES; CREATE TABLE GEOMTYPES(G GEOMETRY, G_S GEOMETRY(GEOMETRY, 1), P GEOMETRY(POINT), P_S GEOMETRY(POINT, 1),\n" +
-                "    PZ1 GEOMETRY(POINT Z), PZ2 GEOMETRY(POINTZ), PZ1_S GEOMETRY(POINT Z, 1), PZ2_S GEOMETRY(POINTZ, 1),\n" +
-                "    PM GEOMETRY(POINT M), PZM GEOMETRY(POINT ZM), PZM_S GEOMETRY(POINT ZM, -100),\n" +
-                "    LS GEOMETRY(LINESTRING), PG GEOMETRY(POLYGON),\n" +
-                "    MP GEOMETRY(MULTIPOINT), MLS GEOMETRY(MULTILINESTRING), MPG GEOMETRY(MULTIPOLYGON),\n" +
-                "    GC GEOMETRY(GEOMETRYCOLLECTION),PGZ GEOMETRY(POLYGONZ),PGM GEOMETRY(POLYGONM),PGZM GEOMETRY(POLYGONZM));\n" +
-                "INSERT INTO GEOMTYPES VALUES ('POINT EMPTY', 'SRID=1;POINT EMPTY', 'POINT EMPTY', 'SRID=1;POINT EMPTY',\n" +
-                "    'POINT Z EMPTY', 'POINT Z EMPTY', 'SRID=1;POINT Z EMPTY', 'SRID=1;POINTZ EMPTY',\n" +
-                "    'POINT M EMPTY', 'POINT ZM EMPTY', 'SRID=-100;POINT ZM EMPTY',\n" +
-                "    'LINESTRING EMPTY', 'POLYGON EMPTY',\n" +
-                "    'MULTIPOINT EMPTY', 'MULTILINESTRING EMPTY', 'MULTIPOLYGON EMPTY',\n" +
-                "    'GEOMETRYCOLLECTION EMPTY','POLYGON Z EMPTY','POLYGON M EMPTY','POLYGON ZM EMPTY');";
+        String sql = "DROP TABLE IF EXISTS GEOMTYPES; CREATE TABLE GEOMTYPES(G GEOMETRY, G_S GEOMETRY(GEOMETRY, 1), P GEOMETRY(POINT), P_S GEOMETRY(POINT, 1),\n"
+                + "    PZ1 GEOMETRY(POINT Z), PZ2 GEOMETRY(POINTZ), PZ1_S GEOMETRY(POINT Z, 1), PZ2_S GEOMETRY(POINTZ, 1),\n"
+                + "    PM GEOMETRY(POINT M), PZM GEOMETRY(POINT ZM), PZM_S GEOMETRY(POINT ZM, -100),\n"
+                + "    LS GEOMETRY(LINESTRING), PG GEOMETRY(POLYGON),\n"
+                + "    MP GEOMETRY(MULTIPOINT), MLS GEOMETRY(MULTILINESTRING), MPG GEOMETRY(MULTIPOLYGON),\n"
+                + "    GC GEOMETRY(GEOMETRYCOLLECTION),PGZ GEOMETRY(POLYGONZ),PGM GEOMETRY(POLYGONM),PGZM GEOMETRY(POLYGONZM));\n"
+                + "INSERT INTO GEOMTYPES VALUES ('POINT EMPTY', 'SRID=1;POINT EMPTY', 'POINT EMPTY', 'SRID=1;POINT EMPTY',\n"
+                + "    'POINT Z EMPTY', 'POINT Z EMPTY', 'SRID=1;POINT Z EMPTY', 'SRID=1;POINTZ EMPTY',\n"
+                + "    'POINT M EMPTY', 'POINT ZM EMPTY', 'SRID=-100;POINT ZM EMPTY',\n"
+                + "    'LINESTRING EMPTY', 'POLYGON EMPTY',\n"
+                + "    'MULTIPOINT EMPTY', 'MULTILINESTRING EMPTY', 'MULTIPOLYGON EMPTY',\n"
+                + "    'GEOMETRYCOLLECTION EMPTY','POLYGON Z EMPTY','POLYGON M EMPTY','POLYGON ZM EMPTY');";
         st.execute(sql);
         SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("GEOMTYPES");
         SimpleFeatureType schema = fs.getSchema();
@@ -456,51 +454,11 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertTrue(geomType.getBinding().isAssignableFrom(Polygon.class));
     }
     
-    
-      @Test
-      void testIterateFeatures() throws IOException, SQLException, CQLException {
-        String inputFile ="/home/ebocher/Autres/data/IGN/BD_parcellaire_ign_lrgf93/PARCELLE.SHP";
-        inputFile = "/home/ebocher/Autres/data/IGN/data_cadastre/parc_dgi/Parc_dgi.shp";
-        //inputFile = "/home/ebocher/Autres/data/DONNEES RENNES/Reseau_Rennes.shp";
-        //st.execute("drop table if exists PARCELS");
-        //st.execute("CALL FILE_TABLE('" + inputFile + "', 'PARCELS');");
-        //st.execute("DROP TABLE IF EXISTS output_table_test");
-        
-         st.execute("drop table if exists PARCELS");
-        st.execute("CREATE TABLE PARCELS ( FID INTEGER, NAME CHARACTER VARYING(64)"
-                + " );"
-                + "INSERT INTO PARCELS VALUES(1, 'Green Forest');"
-                + "INSERT INTO PARCELS VALUES(2, 'Cereal');"
-                + "INSERT INTO PARCELS VALUES(3, 'Building');");
-
-        long start = System.currentTimeMillis();
-         
-        SimpleFeatureSource fs =  ds.getFeatureSource("PARCELS");
-        SimpleFeatureCollection features =  fs.getFeatures();
-        SimpleFeatureIterator iterator = features.features();
-        try {
-            while (iterator.hasNext()) {
-                SimpleFeature feature = iterator.next();
-                System.out.println(feature.getAttribute("FID"));
-            }
-        } finally {
-            iterator.close(); // IMPORTANT
-        }
-
-        /*ds.createSchema(transformed.getSchema());
-        FeatureStore<SimpleFeatureType,SimpleFeature> featStore =
-                (FeatureStore<SimpleFeatureType,SimpleFeature>)ds.getFeatureSource("OUTPUT_TABLE_TEST_F");
-
-        featStore.addFeatures(simpleFeatureCollection);*/
-
-        long end = System.currentTimeMillis();
-        System.out.println("Times " + (end - start) / 1000);
-    }
-     
-     /**
+    /**
      * Generate a path for the database
+     *
      * @param dbName
-     * @return 
+     * @return
      */
     private static String getDataBasePath(String dbName) {
         if (dbName.startsWith("file://")) {
@@ -509,4 +467,4 @@ class H2GISTest extends H2GISDBTestSetUp {
             return new File("target/test-resources/" + dbName).getAbsolutePath();
         }
     }
-   }
+}
