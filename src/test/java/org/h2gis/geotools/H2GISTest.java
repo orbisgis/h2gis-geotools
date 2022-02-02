@@ -349,6 +349,8 @@ class H2GISTest extends H2GISDBTestSetUp {
                 + "INSERT INTO LANDCOVER VALUES(2, 'Cereal', 'POLYGON((200 220, 310 220, 310 160, 200 160, 200 220))');"
                 + "INSERT INTO LANDCOVER VALUES(3, 'Building', 'POLYGON((90 130, 140 130, 140 110, 90 110, 90 130))');");
         VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER WHERE FID=2");
+        //TODO workaround due to H2 2.0 changes on geometry type
+        vTable.addGeometryMetadatata("THE_GEOM", Polygon.class, -1);
         ds.createVirtualTable(vTable);
         SimpleFeatureType type = ds.getSchema("LANDCOVER_CEREAL");
         assertNotNull(type);
