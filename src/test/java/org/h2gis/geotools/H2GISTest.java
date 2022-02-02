@@ -22,6 +22,7 @@ package org.h2gis.geotools;
 
 import java.io.File;
 import org.h2gis.utilities.GeometryTableUtilities;
+import org.h2gis.utilities.JDBCUtilities;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
@@ -117,7 +118,7 @@ class H2GISTest extends H2GISDBTestSetUp {
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', ST_MPolyFromText( 'MULTIPOLYGON(((28 26,28 0,84 0,"
                 + "84 42,28 26), (52 18,66 23,73 9,48 6,52 18)),((59 18,67 18,67 13,59 13,59 18)))', 101));");
 
-        SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("FORESTS");
+        SimpleFeatureSource fs = ds.getFeatureSource("FORESTS");
         SimpleFeatureType schema = fs.getSchema();
         Query query = new Query(schema.getTypeName(), Filter.INCLUDE);
         assertEquals(1, fs.getCount(query));
@@ -133,6 +134,8 @@ class H2GISTest extends H2GISDBTestSetUp {
     void getFeatureSchemaLinkedTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER_LINKED");
         st.execute("CALL FILE_TABLE('" + H2GISTest.class.getResource("landcover.shp").getPath() + "', 'LANDCOVER_LINKED');");
+
+
 
         SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER_LINKED");
         SimpleFeatureType schema = fs.getSchema();
