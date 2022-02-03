@@ -8,7 +8,9 @@ h2gis-geotools release is available on Maven repository.
 Snaphots are available on sonatype repository.
 
 
-You can get current project snapshot here:http://nexus.orbisgis.org/#view-repositories;osgi-maven-snapshot~browseindex
+You can get current project snapshot here:
+
+http://nexus.orbisgis.org/#view-repositories;osgi-maven-snapshot~browseindex
 
 or add to your pom.xml:
 
