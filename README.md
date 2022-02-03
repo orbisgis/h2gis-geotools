@@ -2,7 +2,7 @@
 H2GIS Datastore for the geotools library
 
 
-## Maven Nexus respository
+## Maven respositories
 
 h2gis-geotools release is available on Maven repository.
 Snaphots are available on sonatype repository.
