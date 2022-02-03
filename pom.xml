@@ -2,6 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.orbisgis</groupId>
+        <artifactId>orbisparent</artifactId>
+        <version>1.2.0</version>
+    </parent>
     <groupId>org.h2gis</groupId>
     <artifactId>h2gis-geotools</artifactId>
     <version>2.0.0-SNAPSHOT</version>
@@ -21,17 +26,15 @@
             <url>http://www.gnu.org/copyleft/lesser.txt</url>
         </license>
     </licenses>
-    <parent>
-        <groupId>org.orbisgis</groupId>
-        <artifactId>orbisparent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
-    </parent>
 
     <properties>        
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <geotools-version>23.2</geotools-version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <geotools-version>26.2</geotools-version>
+        <h2gis-version>2.0.0</h2gis-version>
+        <h2-version>2.1.210</h2-version>
+        <cts-version>1.6.0</cts-version>
     </properties>
     <scm>
         <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
@@ -46,6 +49,27 @@
     </developers>
     <repositories>
         <repository>
+            <id>orbisgis-release</id>
+            <url>https://oss.sonatype.org/content/repositories/releases/</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>orbisgis-snapshot</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <snapshots>
+                <updatePolicy>always</updatePolicy>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+        <repository>
             <id>osgeo</id>
             <name>OSGeo Release Repository</name>
             <url>https://repo.osgeo.org/repository/release/</url>
@@ -56,29 +80,48 @@
                 <enabled>true</enabled>
             </releases>
         </repository>
-        <repository>
-            <id>orbisgis-release</id>
-            <url>http://nexus.orbisgis.org/repository/orbisgis-release</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>orbisgis-snapshot</id>
-            <url>http://nexus.orbisgis.org/repository/orbisgis-snapshot</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository>
     </repositories>
 
     <dependencies>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>${h2-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>h2gis</artifactId>
+            <version>${h2gis-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>h2gis-network</artifactId>
+            <version>${h2gis-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>h2gis-utilities</artifactId>
+            <version>${h2gis-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>postgis-jts</artifactId>
+            <version>${h2gis-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>postgis-jts-osgi</artifactId>
+            <version>${h2gis-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>cts</artifactId>
+            <version>${cts-version}</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -103,10 +146,6 @@
             <version>${geotools-version}</version>
         </dependency>
         <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>h2gis</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools-version}</version>
@@ -122,28 +161,39 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>${maven-jar-version}</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Specification-Vendor-URL>${project.organization.url}</Specification-Vendor-URL>
+                            <Specification-URL>${project.url}</Specification-URL>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>versions-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-enforcer-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.gmavenplus</groupId>
-                <artifactId>gmavenplus-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco-maven-version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
