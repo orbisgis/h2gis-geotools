@@ -20,14 +20,11 @@
  */
 package org.h2gis.geotools;
 
-import java.io.File;
 import org.h2gis.utilities.GeometryTableUtilities;
-import org.h2gis.utilities.JDBCUtilities;
 import org.junit.jupiter.api.*;
 import org.locationtech.jts.geom.*;
 import org.locationtech.jts.io.ParseException;
 import java.io.IOException;
-import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -134,9 +131,6 @@ class H2GISTest extends H2GISDBTestSetUp {
     void getFeatureSchemaLinkedTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER_LINKED");
         st.execute("CALL FILE_TABLE('" + H2GISTest.class.getResource("landcover.shp").getPath() + "', 'LANDCOVER_LINKED');");
-
-
-
         SimpleFeatureSource fs = (SimpleFeatureSource) ds.getFeatureSource("LANDCOVER_LINKED");
         SimpleFeatureType schema = fs.getSchema();
         GeometryDescriptor geomDesc = schema.getGeometryDescriptor();
@@ -152,7 +146,7 @@ class H2GISTest extends H2GISDBTestSetUp {
     @Test
     void getBoundingBox() throws SQLException, IOException, ParseException {
         st.execute("drop table if exists FORESTS");
-        st.execute("CREATE TABLE FORESTS ( FID INTEGER, NAME CHARACTER VARYING(64),"
+        st.execute("CREATE TABLE FORESTS ( FID INTEGER PRIMARY KEY, NAME CHARACTER VARYING(64),"
                 + " THE_GEOM GEOMETRY(POLYGON));"
                 + "INSERT INTO FORESTS VALUES(109, 'Green Forest', 'POLYGON((0 0,10 0,10 10, 0 10, 0 0))');");
 
