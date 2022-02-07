@@ -21,6 +21,7 @@
 package org.h2gis.geotools;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.jdbc.PrimaryKey;
 import org.h2gis.utilities.GeometryMetaData;
 import org.h2gis.utilities.GeometryTableUtilities;
 import org.h2gis.utilities.dbtypes.DBTypes;
@@ -397,8 +398,10 @@ public class H2GISDialect extends BasicSQLDialect {
                                        Connection cx) throws SQLException {
         Statement st = cx.createStatement();
         try {
-            String sql = "SELECT nextval('" + sequenceName + "')";
-
+            String sql = "SELECT NEXT VALUE FOR "+schemaName + "."+sequenceName;
+            if (getH2GISVersion(cx).compareTo(V_1_5_0) != 1) {
+                sql = "SELECT nextval('" + sequenceName + "')";
+            }
             dataStore.getLogger().fine(sql);
             ResultSet rs = st.executeQuery(sql);
             try {
@@ -426,7 +429,19 @@ public class H2GISDialect extends BasicSQLDialect {
 
         Statement st = cx.createStatement();
         try {
-            String sql = "SELECT lastval()";
+            // Retrieve the sequence of the column
+            String sequenceName = getSequenceForColumn(schemaName, tableName, columnName, cx);
+            if (sequenceName == null) {
+                // There is no sequence to get the value from
+                return null;
+            }
+
+            String sql = "SELECT CURRENT VALUE FOR "+schemaName+"."+sequenceName;
+
+            if (getH2GISVersion(cx).compareTo(V_1_5_0) != 1) {
+                 sql = "SELECT lastval()";
+            }
+
             dataStore.getLogger().fine(sql);
 
             ResultSet rs = st.executeQuery(sql);
@@ -477,6 +492,7 @@ public class H2GISDialect extends BasicSQLDialect {
         mappings.put("UUID", UUID.class);
         mappings.put("DATE", Date.class);
         mappings.put("JSON", String.class);
+        mappings.put("DECFLOAT", Float.class);
     }
 
     @Override
@@ -799,5 +815,4 @@ public class H2GISDialect extends BasicSQLDialect {
         }
         return srid;
     }
-
 }
