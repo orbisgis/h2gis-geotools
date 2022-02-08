@@ -2,24 +2,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <!-- Maven Coordinates -->
     <parent>
         <groupId>org.orbisgis</groupId>
         <artifactId>orbisparent</artifactId>
         <version>1.2.0</version>
     </parent>
+
     <groupId>org.h2gis</groupId>
     <artifactId>h2gis-geotools</artifactId>
     <version>2.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+
+    <!-- Project Information -->
     <name>H2GIS Geotools driver</name>
-    <description>
-        DataStore for H2GIS Database.
-    </description>
+    <description>DataStore for H2GIS Database.</description>
+
     <organization>
         <name>Lab-STICC - UMR CNRS 6285</name>
         <url>http://www.labsticc.fr/</url>
     </organization>
+
     <url>http://www.h2gis.org</url>
+
     <licenses>
         <license>
             <name>Lesser General Public License (LGPL)</name>
@@ -27,26 +33,33 @@
         </license>
     </licenses>
 
-    <properties>        
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>        
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <geotools-version>26.2</geotools-version>
-        <h2gis-version>2.0.0</h2gis-version>
-        <h2-version>2.1.210</h2-version>
-        <cts-version>1.6.0</cts-version>
-    </properties>
-    <scm>
-        <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
-        <developerConnection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</developerConnection>
-        <url>git@github.com:orbisgis/h2gis-geotools.git</url>
-    </scm>
     <developers>
         <developer>
             <name>Erwan Bocher</name>
             <organization>LAB-STICC CNRS UMR 6285</organization>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</connection>
+        <developerConnection>scm:git:https://github.com/orbisgis/h2gis-geotools.git</developerConnection>
+        <url>git@github.com:orbisgis/h2gis-geotools.git</url>
+    </scm>
+
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/orbisgis/h2gis-geotools/issues</url>
+    </issueManagement>
+
+    <!-- Properties -->
+    <properties>
+        <geotools-version>26.2</geotools-version>
+        <h2gis-version>2.0.0</h2gis-version>
+        <h2-version>2.1.210</h2-version>
+        <cts-version>1.6.0</cts-version>
+    </properties>
+
+    <!-- Dependencies -->
     <repositories>
         <repository>
             <id>orbisgis-release</id>
@@ -220,14 +233,4 @@
             </plugin>
         </plugins>
     </build>
-         <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 </project>
