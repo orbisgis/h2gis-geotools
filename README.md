@@ -40,8 +40,8 @@ or add to your pom.xml:
 
 <dependencies>
     <dependency>
-        <groupId>org.h2gis</groupId>
-        <artifactId>h2gis-geotools</artifactId>
+        <groupId>org.orbisgis</groupId>
+        <artifactId>gt-h2gis</artifactId>
         <version>0.2.0-SNAPSHOT</version>
     </dependency>
 </dependencies>
