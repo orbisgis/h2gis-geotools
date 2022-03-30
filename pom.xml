@@ -12,7 +12,7 @@
 
     <groupId>org.orbisgis</groupId>
     <artifactId>gt-h2gis</artifactId>
-    <version>26.2</version>
+    <version>27-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <!-- Project Information -->
@@ -53,7 +53,7 @@
 
     <!-- Properties -->
     <properties>
-        <geotools-version>26.2</geotools-version>
+        <geotools-version>27-SNAPSHOT</geotools-version>
         <h2gis-version>2.0.0</h2gis-version>
         <h2-version>2.1.210</h2-version>
         <cts-version>1.6.0</cts-version>
@@ -91,6 +91,17 @@
             </snapshots>
             <releases>
                 <enabled>true</enabled>
+            </releases>
+        </repository>
+        <repository>
+            <id>osgeo-snapshots</id>
+            <name>OSGeo Nexus Snapshot Repository</name>
+            <url>https://repo.osgeo.org/repository/snapshot/</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
             </releases>
         </repository>
     </repositories>
@@ -155,12 +166,6 @@
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
-            <artifactId>gt-cql</artifactId>
-            <version>${geotools-version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools-version}</version>
             <scope>test</scope>
@@ -168,6 +173,12 @@
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-extension</artifactId>
+            <version>${geotools-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-cql</artifactId>
             <version>${geotools-version}</version>
             <scope>test</scope>
         </dependency>
