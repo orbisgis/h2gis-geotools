@@ -10,7 +10,7 @@ Snaphots are available on sonatype repository.
 
 You can get current project snapshot here:
 
-http://nexus.orbisgis.org/#view-repositories;osgi-maven-snapshot~browseindex
+https://oss.sonatype.org/#nexus-search;quick~gt-h2gis
 
 or add to your pom.xml:
 
@@ -42,11 +42,11 @@ or add to your pom.xml:
     <dependency>
         <groupId>org.orbisgis</groupId>
         <artifactId>gt-h2gis</artifactId>
-        <version>0.2.0-SNAPSHOT</version>
+        <version>26.2</version>
     </dependency>
 </dependencies>
 ```
-The snapshot version is compatible with Geotools 26.X
+The snapshot version is compatible with Geotools 27.X
 
 
 ## Example
