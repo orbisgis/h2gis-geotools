@@ -16,16 +16,6 @@ or add to your pom.xml:
 
 ```xml
 <repositories>
-      <repository>
-            <id>orbisgis-release</id>
-            <url>https://oss.sonatype.org/content/repositories/releases/</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
         <repository>
             <id>orbisgis-snapshot</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
@@ -42,7 +32,7 @@ or add to your pom.xml:
     <dependency>
         <groupId>org.orbisgis</groupId>
         <artifactId>gt-h2gis</artifactId>
-        <version>26.2</version>
+        <version>27-SNAPSHOT</version>
     </dependency>
 </dependencies>
 ```
