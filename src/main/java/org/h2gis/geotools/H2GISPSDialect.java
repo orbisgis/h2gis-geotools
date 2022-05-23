@@ -1,10 +1,10 @@
 /*
- * h2gis-geotools is an extension to the geotools library to connect H2GIS a 
+ * h2gis-geotools is an extension to the geotools library to connect H2GIS a
  * spatial library that brings spatial support to the H2 Java database. *
  *
  * Copyright (C) 2017 LAB-STICC CNRS UMR 6285
  *
- * h2gis-geotools is free software; 
+ * h2gis-geotools is free software;
  * you can redistribute it and/or modify it under the terms of the GNU
  * Lesser General Public License as published by the Free Software Foundation;
  * version 3.0 of the License.
@@ -43,13 +43,12 @@ import org.opengis.feature.type.GeometryDescriptor;
 
 public class H2GISPSDialect extends PreparedStatementSQLDialect {
 
-    private H2GISDialect delegate;
+    private final H2GISDialect delegate;
 
     public H2GISPSDialect(JDBCDataStore store, H2GISDialect delegate) {
         super(store);
         this.delegate = delegate;
     }
-
 
     @Override
     public boolean isAggregatedSortSupported(String function) {
@@ -57,14 +56,13 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
     }
 
     @Override
-    public boolean includeTable(String schemaName, String tableName, Connection cx)
-            throws SQLException {
+    public boolean includeTable(String schemaName, String tableName, Connection cx) {
         return delegate.includeTable(schemaName, tableName, cx);
     }
 
     @Override
     public Envelope decodeGeometryEnvelope(ResultSet rs, int column, Connection cx)
-            throws SQLException, IOException {
+            throws SQLException {
         return delegate.decodeGeometryEnvelope(rs, column, cx);
     }
 
@@ -162,7 +160,6 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
         return delegate.getSequenceForColumn(schemaName, tableName, columnName, cx);
     }
 
-
     @Override
     public void postCreateTable(String schemaName, SimpleFeatureType featureType, Connection cx)
             throws SQLException {
@@ -176,8 +173,7 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
     }
 
     @Override
-    public void postDropTable(String schemaName, SimpleFeatureType featureType, Connection cx)
-            throws SQLException {
+    public void postDropTable(String schemaName, SimpleFeatureType featureType, Connection cx) {
         delegate.postDropTable(schemaName, featureType, cx);
     }
 
@@ -257,14 +253,6 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
         return delegate.getGeometryDimension(schemaName, tableName, columnName, cx);
     }
 
-    public boolean isFunctionEncodingEnabled() {
-        return delegate.isFunctionEncodingEnabled();
-    }
-
-    public void setFunctionEncodingEnabled(boolean functionEncodingEnabled) {
-        delegate.setFunctionEncodingEnabled(functionEncodingEnabled);
-    }
-
     @Override
     protected String getArrayComponentTypeName(AttributeDescriptor att) throws SQLException {
         if (att == null) {
@@ -277,11 +265,6 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
             return name.substring(1);
         }
         return super.getArrayComponentTypeName(att);
-    }
-
-    public void encodeGeometryValue(Geometry value, int dimension, int srid, StringBuffer sql)
-            throws IOException {
-        delegate.encodeGeometryValue(value, dimension, srid, sql);
     }
 
     @Override

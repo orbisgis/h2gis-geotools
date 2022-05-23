@@ -1,10 +1,10 @@
 /*
- * h2gis-geotools is an extension to the geotools library to connect H2GIS a 
+ * h2gis-geotools is an extension to the geotools library to connect H2GIS a
  * spatial library that brings spatial support to the H2 Java database. *
  *
  * Copyright (C) 2017 LAB-STICC CNRS UMR 6285
  *
- * h2gis-geotools is free software; 
+ * h2gis-geotools is free software;
  * you can redistribute it and/or modify it under the terms of the GNU
  * Lesser General Public License as published by the Free Software Foundation;
  * version 3.0 of the License.
@@ -30,18 +30,15 @@ import org.opengis.filter.expression.Literal;
 import org.opengis.filter.expression.PropertyName;
 import org.opengis.filter.spatial.BinarySpatialOperator;
 
-/**
- *
- * @author Erwan Bocher
- */
+/** @author Erwan Bocher */
 public class H2GISFilterToSQL extends FilterToSQL {
 
     H2GISFilterToSQLHelper h2GISFilterToSQLHelper;
     private boolean functionEncodingEnabled;
 
-    public H2GISFilterToSQL(H2GISDialect dialect) {
+    public H2GISFilterToSQL() {
         h2GISFilterToSQLHelper = new H2GISFilterToSQLHelper(this);
-    }   
+    }
 
     @Override
     protected void visitLiteralGeometry(Literal expression) throws IOException {
@@ -50,9 +47,9 @@ public class H2GISFilterToSQL extends FilterToSQL {
         out.write("ST_GeomFromText('");
         out.write(geom.toText());
         if (currentSRID == null && currentGeometry != null) {
-        // if we don't know at all, use the srid of the geometry we're comparing against
-        // (much slower since that has to be extracted record by record as opposed to
-        // being a constant)
+            // if we don't know at all, use the srid of the geometry we're comparing against
+            // (much slower since that has to be extracted record by record as opposed to
+            // being a constant)
             out.write("', ST_SRID(\"" + currentGeometry.getLocalName() + "\"))");
         } else {
             out.write("', " + currentSRID + ")");
@@ -65,20 +62,23 @@ public class H2GISFilterToSQL extends FilterToSQL {
     }
 
     @Override
-    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter,
-            PropertyName property, Literal geometry, boolean swapped,
+    protected Object visitBinarySpatialOperator(
+            BinarySpatialOperator filter,
+            PropertyName property,
+            Literal geometry,
+            boolean swapped,
             Object extraData) {
         h2GISFilterToSQLHelper.out = out;
-        return h2GISFilterToSQLHelper.visitBinarySpatialOperator(filter, property, geometry,
-                swapped, extraData);
+        return h2GISFilterToSQLHelper.visitBinarySpatialOperator(
+                filter, property, geometry, swapped, extraData);
     }
 
     @Override
-    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, Expression e1,
-            Expression e2, Object extraData) {
+    protected Object visitBinarySpatialOperator(
+            BinarySpatialOperator filter, Expression e1, Expression e2, Object extraData) {
         h2GISFilterToSQLHelper.out = out;
         return h2GISFilterToSQLHelper.visitBinarySpatialOperator(filter, e1, e2, extraData);
-    }   
+    }
 
     @Override
     public Object visit(Function function, Object extraData) throws RuntimeException {
@@ -103,14 +103,11 @@ public class H2GISFilterToSQL extends FilterToSQL {
     }
 
     @Override
-    protected String cast(String encodedProperty, Class target) throws IOException {
+    protected String cast(String encodedProperty, Class target) {
         return h2GISFilterToSQLHelper.cast(encodedProperty, target);
     }
 
-    /**
-     * 
-     * @param functionEncodingEnabled 
-     */
+    /** @param functionEncodingEnabled */
     public void setFunctionEncodingEnabled(boolean functionEncodingEnabled) {
         this.functionEncodingEnabled = functionEncodingEnabled;
     }
