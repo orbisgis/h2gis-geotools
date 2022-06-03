@@ -468,4 +468,17 @@ class H2GISTest extends H2GISDBTestSetUp {
         assertNotNull(ds.getSchema(schema.getName()));
         assertNotNull(ds.getFeatureSource(tableName));
     }
+
+    @Test
+    void getFeaturesGeometrySRID() throws SQLException, IOException {
+        st.execute("drop table if exists LANDCOVER");
+        st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
+                + " THE_GEOM GEOMETRY(POLYGON,4326));"
+                + "INSERT INTO LANDCOVER VALUES(1, 'Green Forest', 'SRID=4326;POLYGON((110 330, 210 330, 210 240, 110 240, 110 330))');");
+        VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER");
+        ds.createVirtualTable(vTable);
+        FeatureSource fs = ds.getFeatureSource("LANDCOVER_CEREAL");
+        assertNotNull(fs.getSchema().getGeometryDescriptor());
+        st.execute("drop table LANDCOVER");
+    }
 }

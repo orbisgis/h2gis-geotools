@@ -187,6 +187,8 @@ public class H2GISDialect extends BasicSQLDialect {
         return true;
     }
 
+
+
     @Override
     public void encodeGeometryColumn(GeometryDescriptor gatt, String prefix, int srid, Hints hints,
                                      StringBuffer sql) {
@@ -814,5 +816,13 @@ public class H2GISDialect extends BasicSQLDialect {
             }
         }
         return srid;
+    }
+
+    @Override
+    public Class<?> getDesiredColumnMapping(String sqlTypeName) {
+        if(sqlTypeName.toLowerCase().startsWith("geometry")){
+            return Geometry.class;
+        }
+        return null;
     }
 }
