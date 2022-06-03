@@ -470,7 +470,7 @@ class H2GISTest extends H2GISDBTestSetUp {
     }
 
     @Test
-    void getFeaturesGeometrySRID() throws SQLException, IOException {
+    void getGeometryTypeFRomVirtualTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
                 + " THE_GEOM GEOMETRY(POLYGON,4326));"
@@ -478,7 +478,9 @@ class H2GISTest extends H2GISDBTestSetUp {
         VirtualTable vTable = new VirtualTable("LANDCOVER_CEREAL", "SELECT * FROM PUBLIC.LANDCOVER");
         ds.createVirtualTable(vTable);
         FeatureSource fs = ds.getFeatureSource("LANDCOVER_CEREAL");
-        assertNotNull(fs.getSchema().getGeometryDescriptor());
+        GeometryDescriptor geomDes = fs.getSchema().getGeometryDescriptor();
+        assertNotNull(geomDes);
+        assertEquals(Polygon.class,geomDes.getType().getBinding());
         st.execute("drop table LANDCOVER");
     }
 }
