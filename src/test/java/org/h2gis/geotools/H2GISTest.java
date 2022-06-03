@@ -470,7 +470,7 @@ class H2GISTest extends H2GISDBTestSetUp {
     }
 
     @Test
-    void getGeometryTypeFRomVirtualTable() throws SQLException, IOException {
+    void getGeometryTypeFromVirtualTable() throws SQLException, IOException {
         st.execute("drop table if exists LANDCOVER");
         st.execute("CREATE TABLE LANDCOVER ( FID INTEGER, NAME CHARACTER VARYING(64),"
                 + " THE_GEOM GEOMETRY(POLYGON,4326));"
