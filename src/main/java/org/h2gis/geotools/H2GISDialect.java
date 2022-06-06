@@ -823,7 +823,7 @@ public class H2GISDialect extends BasicSQLDialect {
     }
 
     @Override
-    public Class<?> getDesiredColumnMapping(String sqlTypeName) {
+    public Class<?> getMapping(String sqlTypeName) {
         if(sqlTypeName.toLowerCase().startsWith("geometry")){
             return findGeometryClass(sqlTypeName);
         }
