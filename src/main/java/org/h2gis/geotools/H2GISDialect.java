@@ -54,7 +54,9 @@ import org.opengis.feature.type.AttributeDescriptor;
 import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-/** H2GIS dialect */
+/**
+ * H2GIS dialect
+ */
 public class H2GISDialect extends BasicSQLDialect {
 
     private Version h2gisVersion;
@@ -63,41 +65,41 @@ public class H2GISDialect extends BasicSQLDialect {
 
     static final Version V_2_0_0 = new Version("2.0.0");
 
-    static final Version V_2_1_0 = new Version("2.1.0");
+    static Pattern GEOMETRY_TABLE_PATTERN =  Pattern.compile("(?:(?:GEOMETRY\\s*\\(\\s*([a-zA-Z]+\\s*(?:[ZM]+)?)\\s*(?:,\\s*([\\d]+))?\\))|^\\s*([a-zA-Z]+\\s*(?:[ZM]+)?))", Pattern.CASE_INSENSITIVE);
+    ;
 
-    // geometry type to class map
-    static final Map<String, Class<?>> TYPE_TO_CLASS_MAP =
-            new HashMap<String, Class<?>>() {
-                {
-                    put("GEOMETRY", Geometry.class);
-                    put("POINT", Point.class);
-                    put("POINTM", Point.class);
-                    put("POINTZ", Point.class);
-                    put("POINTZM", Point.class);
-                    put("LINESTRING", LineString.class);
-                    put("LINESTRINGM", LineString.class);
-                    put("LINESTRINGZ", LineString.class);
-                    put("LINESTRINGZM", LineString.class);
-                    put("POLYGON", Polygon.class);
-                    put("POLYGONM", Polygon.class);
-                    put("POLYGONZ", Polygon.class);
-                    put("POLYGONZM", Polygon.class);
-                    put("MULTIPOINT", MultiPoint.class);
-                    put("MULTIPOINTM", MultiPoint.class);
-                    put("MULTIPOINTZ", MultiPoint.class);
-                    put("MULTIPOINTZM", MultiPoint.class);
-                    put("MULTILINESTRING", MultiLineString.class);
-                    put("MULTILINESTRINGM", MultiLineString.class);
-                    put("MULTILINESTRINGZ", MultiLineString.class);
-                    put("MULTILINESTRINGZM", MultiLineString.class);
-                    put("MULTIPOLYGON", MultiPolygon.class);
-                    put("MULTIPOLYGONM", MultiPolygon.class);
-                    put("MULTIPOLYGONZ", MultiPolygon.class);
-                    put("MULTIPOLYGONZM", MultiPolygon.class);
-                    put("GEOMETRYCOLLECTION", GeometryCollection.class);
-                    put("BYTEA", byte[].class);
-                }
-            };
+    //geometry type to class map
+    final static Map<String, Class> TYPE_TO_CLASS_MAP = new HashMap<String, Class>() {
+        {
+            put("GEOMETRY", Geometry.class);
+            put("POINT", Point.class);
+            put("POINTM", Point.class);
+            put("POINTZ", Point.class);
+            put("POINTZM", Point.class);
+            put("LINESTRING", LineString.class);
+            put("LINESTRINGM", LineString.class);
+            put("LINESTRINGZ", LineString.class);
+            put("LINESTRINGZM", LineString.class);
+            put("POLYGON", Polygon.class);
+            put("POLYGONM", Polygon.class);
+            put("POLYGONZ", Polygon.class);
+            put("POLYGONZM", Polygon.class);
+            put("MULTIPOINT", MultiPoint.class);
+            put("MULTIPOINTM", MultiPoint.class);
+            put("MULTIPOINTZ", MultiPoint.class);
+            put("MULTIPOINTZM", MultiPoint.class);
+            put("MULTILINESTRING", MultiLineString.class);
+            put("MULTILINESTRINGM", MultiLineString.class);
+            put("MULTILINESTRINGZ", MultiLineString.class);
+            put("MULTILINESTRINGZM", MultiLineString.class);
+            put("MULTIPOLYGON", MultiPolygon.class);
+            put("MULTIPOLYGONM", MultiPolygon.class);
+            put("MULTIPOLYGONZ", MultiPolygon.class);
+            put("MULTIPOLYGONZM", MultiPolygon.class);
+            put("GEOMETRYCOLLECTION", GeometryCollection.class);
+            put("BYTEA", byte[].class);
+        }
+    };
 
     // geometry class to type map
     static final Map<Class<?>, String> CLASS_TO_TYPE_MAP =
@@ -125,6 +127,16 @@ public class H2GISDialect extends BasicSQLDialect {
     }
 
     /**
+     * true is the dialect uses the ST_EstimatedExtent function to compute the
+     * envelope of the table
+     *
+     * @return
+     */
+    public boolean isEstimatedExtentsEnabled() {
+        return estimatedExtentsEnabled;
+    }
+
+    /**
      * Set to true to use the ST_EstimatedExtent function
      *
      * @param estimatedExtentsEnabled True to use the ST_EstimatedExtent function
@@ -133,8 +145,21 @@ public class H2GISDialect extends BasicSQLDialect {
         this.estimatedExtentsEnabled = estimatedExtentsEnabled;
     }
 
+    /**
+     * @param dataStore
+     * @param delegate
+     */
+    public H2GISDialect(JDBCDataStore dataStore, H2GISDialect delegate) {
+        super(dataStore);
+        this.delegate = delegate;
+    }
+
     public H2GISDialect(JDBCDataStore dataStore) {
         super(dataStore);
+    }
+
+    H2GISDialect getDelegate() {
+        return delegate;
     }
 
     /**
@@ -219,8 +244,7 @@ public class H2GISDialect extends BasicSQLDialect {
                 if (geomMetata != null) {
                     gType = geomMetata.getGeometryType();
                 }
-            } else if (getH2GISVersion(cx).compareTo(V_2_0_0) <= 0
-                    || getH2GISVersion(cx).compareTo(V_2_1_0) <= 0) {
+            } else if (getH2GISVersion(cx).compareTo(V_2_0_0) <= 0) {
                 GeometryMetaData geomMetata =
                         GeometryMetaData.getMetaDataFromTablePattern(typeName);
                 if (geomMetata != null) {
@@ -258,16 +282,9 @@ public class H2GISDialect extends BasicSQLDialect {
             srid = getSRID(cx, schemaName, tableName, columnName);
 
         } catch (SQLException e) {
-            LOGGER.log(
-                    Level.WARNING,
-                    "Failed to retrieve information about "
-                            + schemaName
-                            + "."
-                            + tableName
-                            + "."
-                            + columnName
-                            + " from the geometry_columns table, checking the first geometry instead",
-                    e);
+            LOGGER.log(Level.WARNING, "Failed to retrieve information about "
+                    + schemaName + "." + tableName + "." + columnName
+                    + " from the geometry_columns table, checking the first geometry instead", e);
         }
 
         // fall back on inspection of the first geometry, assuming uniform srid (fair assumption
@@ -849,5 +866,122 @@ public class H2GISDialect extends BasicSQLDialect {
             }
         }
         return srid;
+    }
+
+    @Override
+    public Class<?> getMapping(String sqlTypeName) {
+        if(sqlTypeName.toLowerCase().startsWith("geometry")){
+            return findGeometryClass(sqlTypeName);
+        }
+        return null;
+    }
+
+    /**
+     * This method is used to retrieved the geometry class according the H2 metadata type formes
+     * eg : GEOMETRY, GEOMETRY(POLYGON), GEOMETRY(POLYGON, 4326), GEOMETRY(POLYGON Z, 4326)...
+     * @param geometryName the input geometry type name
+     * @return the corresponding JTS geometry class
+     */
+    public Class<?> findGeometryClass(String geometryName){
+        Class<?> geometryClass = Geometry.class;
+        Matcher matcher = GEOMETRY_TABLE_PATTERN.matcher(geometryName);
+        if (matcher.find()) {
+            String type = matcher.group(1);
+            if (type == null) {
+                return  geometryClass ;
+            } else {
+                type = type.replaceAll(" ", "").replaceAll("\"", "");
+                switch (type) {
+                    case "POINT":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRING":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGON":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINT":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRING":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGON":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTION":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTZ":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGZ":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONZ":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTZ":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGZ":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONZ":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONZ":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTM":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGM":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONM":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTM":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGM":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONM":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONM":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTZM":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGZM":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONZM":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTZM":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGZM":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONZM":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONZM":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "GEOMETRY":
+                    default:
+                }
+                return geometryClass;
+            }
+        }
+        return  geometryClass ;
     }
 }
