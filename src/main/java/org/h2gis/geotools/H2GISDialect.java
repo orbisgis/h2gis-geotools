@@ -21,7 +21,6 @@
 package org.h2gis.geotools;
 
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.jdbc.PrimaryKey;
 import org.h2gis.utilities.GeometryMetaData;
 import org.h2gis.utilities.GeometryTableUtilities;
 import org.h2gis.utilities.dbtypes.DBTypes;
@@ -44,6 +43,8 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.geotools.data.jdbc.FilterToSQL;
 import org.geotools.util.factory.Hints;
@@ -70,6 +71,9 @@ public class H2GISDialect extends BasicSQLDialect {
     static final Version V_1_5_0 = new Version("1.5.0");
 
     static final Version V_2_0_0 = new Version("2.0.0");
+
+    static Pattern GEOMETRY_TABLE_PATTERN =  Pattern.compile("(?:(?:GEOMETRY\\s*\\(\\s*([a-zA-Z]+\\s*(?:[ZM]+)?)\\s*(?:,\\s*([\\d]+))?\\))|^\\s*([a-zA-Z]+\\s*(?:[ZM]+)?))", Pattern.CASE_INSENSITIVE);
+    ;
 
     //geometry type to class map
     final static Map<String, Class> TYPE_TO_CLASS_MAP = new HashMap<String, Class>() {
@@ -186,6 +190,8 @@ public class H2GISDialect extends BasicSQLDialect {
         }
         return true;
     }
+
+
 
     @Override
     public void encodeGeometryColumn(GeometryDescriptor gatt, String prefix, int srid, Hints hints,
@@ -814,5 +820,122 @@ public class H2GISDialect extends BasicSQLDialect {
             }
         }
         return srid;
+    }
+
+    @Override
+    public Class<?> getMapping(String sqlTypeName) {
+        if(sqlTypeName.toLowerCase().startsWith("geometry")){
+            return findGeometryClass(sqlTypeName);
+        }
+        return null;
+    }
+
+    /**
+     * This method is used to retrieved the geometry class according the H2 metadata type formes
+     * eg : GEOMETRY, GEOMETRY(POLYGON), GEOMETRY(POLYGON, 4326), GEOMETRY(POLYGON Z, 4326)...
+     * @param geometryName the input geometry type name
+     * @return the corresponding JTS geometry class
+     */
+    public Class<?> findGeometryClass(String geometryName){
+        Class<?> geometryClass = Geometry.class;
+        Matcher matcher = GEOMETRY_TABLE_PATTERN.matcher(geometryName);
+        if (matcher.find()) {
+            String type = matcher.group(1);
+            if (type == null) {
+                return  geometryClass ;
+            } else {
+                type = type.replaceAll(" ", "").replaceAll("\"", "");
+                switch (type) {
+                    case "POINT":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRING":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGON":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINT":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRING":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGON":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTION":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTZ":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGZ":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONZ":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTZ":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGZ":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONZ":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONZ":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTM":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGM":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONM":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTM":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGM":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONM":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONM":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "POINTZM":
+                        geometryClass= Point.class;
+                        break;
+                    case "LINESTRINGZM":
+                        geometryClass= LineString.class;
+                        break;
+                    case "POLYGONZM":
+                        geometryClass= Polygon.class;
+                        break;
+                    case "MULTIPOINTZM":
+                        geometryClass= MultiPoint.class;
+                        break;
+                    case "MULTILINESTRINGZM":
+                        geometryClass= MultiLineString.class;
+                        break;
+                    case "MULTIPOLYGONZM":
+                        geometryClass= MultiPolygon.class;
+                        break;
+                    case "GEOMETRYCOLLECTIONZM":
+                        geometryClass= GeometryCollection.class;
+                        break;
+                    case "GEOMETRY":
+                    default:
+                }
+                return geometryClass;
+            }
+        }
+        return  geometryClass ;
     }
 }
