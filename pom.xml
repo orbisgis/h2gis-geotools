@@ -128,17 +128,8 @@
             <version>${h2gis-version}</version>
         </dependency>
         <dependency>
-            <groupId>org.osgi</groupId>
-            <artifactId>org.osgi.service.jdbc</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>postgis-jts</artifactId>
-            <version>${h2gis-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>postgis-jts-osgi</artifactId>
             <version>${h2gis-version}</version>
         </dependency>
         <dependency>
