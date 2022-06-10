@@ -84,8 +84,8 @@ public class H2GISFilterToSQLHelper {
      * @param encodeFunctions
      * @return
      */
-    public static FilterCapabilities createFilterCapabilities(boolean encodeFunctions) {
-        FilterCapabilities caps = new FilterCapabilities();
+    public static FilterCapabilities createFilterCapabilities(boolean encodeFunctions, FilterCapabilities superCaps) {
+        FilterCapabilities caps = superCaps;
         caps.addAll(SQLDialect.BASE_DBMS_CAPABILITIES);
         // adding the spatial filters support
         caps.addType(BBOX.class);

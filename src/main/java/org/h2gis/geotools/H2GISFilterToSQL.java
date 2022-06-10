@@ -58,7 +58,7 @@ public class H2GISFilterToSQL extends FilterToSQL {
 
     @Override
     protected FilterCapabilities createFilterCapabilities() {
-        return H2GISFilterToSQLHelper.createFilterCapabilities(functionEncodingEnabled);
+        return H2GISFilterToSQLHelper.createFilterCapabilities(functionEncodingEnabled, super.createFilterCapabilities());
     }
 
     @Override

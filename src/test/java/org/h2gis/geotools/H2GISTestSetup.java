@@ -49,7 +49,7 @@ public class H2GISTestSetup extends JDBCTestSetup {
         run(sql);
 
         sql =
-                "CREATE INDEX IF NOT EXISTS \"ft1_str_index\" ON \"geotools\".\"ft1\"(\"stringProperty\")";
+                "CREATE SPATIAL INDEX IF NOT EXISTS \"ft1_sp_index\" ON \"geotools\".\"ft1\"(\"geometry\")";
         run(sql);
 
         runFt4();
@@ -113,7 +113,7 @@ public class H2GISTestSetup extends JDBCTestSetup {
     protected Properties createOfflineFixture() {
         Properties fixture = new Properties();
         fixture.put("driver", "org.h2.Driver");
-        fixture.put("url", "jdbc:h2:./target/geotools155555555");
+        fixture.put("url", "jdbc:h2:./target/geotools");
         fixture.put("user", "geotools");
         fixture.put("password", "geotools");
         fixture.put("database", "target/geotools");

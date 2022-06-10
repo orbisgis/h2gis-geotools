@@ -56,8 +56,9 @@ public final class H2GISNativeFilterTestSetup extends JDBCNativeFilterTestSetup 
                 "INSERT INTO  \"geotools\".\"gt_jdbc_test_measurements\" VALUES "
                         + "(6, '#6', 'humidity', 0.5, ST_GeomFromText('POINT (5.0 4.0)', 4326));");
         // create the spatial index
+        run("DROP INDEX IF EXISTS \"geotools\".SPIDX");
         run(
-                "Create Spatial Index spIdx ON \"geotools\".\"gt_jdbc_test_measurements\"(\"location\"));");
+                "Create Spatial Index spIdx ON \"geotools\".\"gt_jdbc_test_measurements\"(\"location\");");
     }
 
     @Override

@@ -4,13 +4,13 @@
 
     <!-- Maven Coordinates -->
     <parent>
-        <groupId>org.orbisgis</groupId>
-        <artifactId>orbisparent</artifactId>
-        <version>1.2.0</version>
+      <groupId>org.geotools.jdbc</groupId>
+      <artifactId>gt-jdbc</artifactId>
+      <version>28-SNAPSHOT</version>
     </parent>
 
     <groupId>org.orbisgis</groupId>
-    <artifactId>gt-h2gis</artifactId>
+    <artifactId>gt-jdbc-h2gis</artifactId>
     <version>28-SNAPSHOT</version>
     <packaging>jar</packaging>
 
@@ -102,11 +102,6 @@
     </dependency>
     <dependency>
       <groupId>org.geotools</groupId>
-      <artifactId>gt-jdbc</artifactId>
-      <version>${geotools-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
       <artifactId>gt-main</artifactId>
       <version>${geotools-version}</version>
     </dependency>
@@ -139,12 +134,6 @@
       <artifactId>junit-jupiter-engine</artifactId>
       <version>${junit-version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-jdbc</artifactId>
-      <version>${geotools-version}</version>
-      <type>test-jar</type>
     </dependency>
   </dependencies>
 

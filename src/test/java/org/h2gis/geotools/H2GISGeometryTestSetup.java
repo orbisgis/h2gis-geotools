@@ -11,6 +11,6 @@ public class H2GISGeometryTestSetup extends JDBCGeometryTestSetup {
 
     @Override
     protected void dropSpatialTable(String tableName) {
-        runSafe("DROP TABLE IF EXISTS \"" + tableName + "\"");
+        runSafe("DROP TABLE IF EXISTS \"geotools\".\"" + tableName + "\"");
     }
 }
