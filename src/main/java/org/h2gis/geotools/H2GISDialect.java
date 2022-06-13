@@ -20,6 +20,7 @@
  */
 package org.h2gis.geotools;
 
+import java.io.IOException;
 import java.sql.*;
 import java.sql.Date;
 import java.sql.Time;
@@ -35,8 +36,10 @@ import org.geotools.referencing.CRS;
 import org.geotools.util.Version;
 import org.geotools.util.factory.Hints;
 import org.h2.value.ValueGeometry;
+import org.h2gis.functions.factory.H2GISFunctions;
 import org.h2gis.utilities.GeometryMetaData;
 import org.h2gis.utilities.GeometryTableUtilities;
+import org.h2gis.utilities.JDBCUtilities;
 import org.h2gis.utilities.TableLocation;
 import org.h2gis.utilities.dbtypes.DBTypes;
 import org.locationtech.jts.geom.Envelope;
@@ -980,5 +983,18 @@ public class H2GISDialect extends BasicSQLDialect {
             }
         }
         return geometryClass;
+    }
+
+    /**
+     * This method is used to init the H2GIS spatial functions
+     *
+     * @param cx connection to the database
+     * @throws IOException
+     */
+    public static void initSpatialFunctions(Connection cx) throws SQLException {
+        // Add the spatial function
+        if (!JDBCUtilities.tableExists(cx, new TableLocation("GEOMETRY_COLUMNS"))) {
+            H2GISFunctions.load(cx);
+        }
     }
 }

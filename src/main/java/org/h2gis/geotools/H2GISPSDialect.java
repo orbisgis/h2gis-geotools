@@ -218,7 +218,7 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
             throws SQLException {
         if (g != null && !g.isEmpty()) {
             if (g instanceof LinearRing) {
-                // postgis does not handle linear rings, convert to just a line string
+                // h2gis does not handle linear rings, convert to just a line string
                 g = g.getFactory().createLineString(((LinearRing) g).getCoordinateSequence());
             }
 
@@ -259,8 +259,6 @@ public class H2GISPSDialect extends PreparedStatementSQLDialect {
             return null;
         }
         String name = (String) att.getUserData().get(JDBCDataStore.JDBC_NATIVE_TYPENAME);
-        // in postgresql jdbc the database metadata TYPE_NAME column contains the
-        // array "base type" name, prefixed with an underscore
         if (name != null && name.startsWith("_")) {
             return name.substring(1);
         }
