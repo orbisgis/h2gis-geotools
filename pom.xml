@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <!-- Maven Coordinates -->
-    <parent>
-      <groupId>org.geotools.jdbc</groupId>
-      <artifactId>gt-jdbc</artifactId>
-      <version>28-SNAPSHOT</version>
-    </parent>
-
-    <groupId>org.orbisgis</groupId>
-    <artifactId>gt-jdbc-h2gis</artifactId>
+  <!-- Maven Coordinates -->
+  <parent>
+    <groupId>org.geotools.jdbc</groupId>
+    <artifactId>gt-jdbc</artifactId>
     <version>28-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  </parent>
+
+  <groupId>org.orbisgis</groupId>
+  <artifactId>gt-jdbc-h2gis</artifactId>
+  <version>28-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
   <!-- Project Information -->
   <name>H2GIS DataStore</name>
@@ -89,11 +88,6 @@
     <dependency>
       <groupId>org.orbisgis</groupId>
       <artifactId>postgis-jts</artifactId>
-      <version>${h2gis-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.orbisgis</groupId>
-      <artifactId>postgis-jts-osgi</artifactId>
       <version>${h2gis-version}</version>
     </dependency>
     <dependency>

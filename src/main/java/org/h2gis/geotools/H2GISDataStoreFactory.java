@@ -236,7 +236,8 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     protected DataSource createDataSource(Map<String, ?> params, SQLDialect dialect)
             throws IOException {
         BasicDataSource dataSource = new BasicDataSource();
-        dataSource.setUrl(getJDBCUrl(params));
+        String jdbURL = getJDBCUrl(params);
+        dataSource.setUrl(jdbURL);
         String username = (String) USER.lookUp(params);
         if (username != null) {
             dataSource.setUsername(username);
@@ -249,20 +250,22 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
         dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setPoolPreparedStatements(false);
 
-        // if we got here the database has been created, now verify it has the H2GIS extension
-        // and eventually try to create them
-        JDBCDataStore closer = new JDBCDataStore();
-        Connection cx = null;
-        try {
-            cx = dataSource.getConnection();
-            // Add the spatial function
-            if (!JDBCUtilities.tableExists(cx, new TableLocation("GEOMETRY_COLUMNS"))) {
-                H2GISFunctions.load(cx);
+        if (!jdbURL.contains("h2:tcp")) {
+            // if we got here the database has been created, now verify it has the H2GIS extension
+            // and eventually try to create them
+            JDBCDataStore closer = new JDBCDataStore();
+            Connection cx = null;
+            try {
+                cx = dataSource.getConnection();
+                // Add the spatial function
+                if (!JDBCUtilities.tableExists(cx, new TableLocation("GEOMETRY_COLUMNS"))) {
+                    H2GISFunctions.load(cx);
+                }
+            } catch (SQLException e) {
+                throw new IOException("Failed to create the target database", e);
+            } finally {
+                closer.closeSafe(cx);
             }
-        } catch (SQLException e) {
-            throw new IOException("Failed to create the target database", e);
-        } finally {
-            closer.closeSafe(cx);
         }
 
         return new DBCPDataSource(dataSource);
