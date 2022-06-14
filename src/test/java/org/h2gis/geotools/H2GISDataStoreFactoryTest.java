@@ -1,106 +1,127 @@
 /*
- * h2gis-geotools is an extension to the geotools library to connect H2GIS a 
- * spatial library that brings spatial support to the H2 Java database. *
+ *    GeoTools - The Open Source Java GIS Toolkit
+ *    http://geotools.org
  *
- * Copyright (C) 2017 LAB-STICC CNRS UMR 6285
+ *    (C) 2002-2008, Open Source Geospatial Foundation (OSGeo)
  *
- * h2gis-geotools is free software; 
- * you can redistribute it and/or modify it under the terms of the GNU
- * Lesser General Public License as published by the Free Software Foundation;
- * version 3.0 of the License.
+ *    This library is free software; you can redistribute it and/or
+ *    modify it under the terms of the GNU Lesser General Public
+ *    License as published by the Free Software Foundation;
+ *    version 2.1 of the License.
  *
- * h2gis-geotools is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details <http://www.gnu.org/licenses/>.
- *
- *
- * For more information, please consult: <http://www.h2gis.org/>
- * or contact directly: info_at_h2gis.org
+ *    This library is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *    Lesser General Public License for more details.
  */
 package org.h2gis.geotools;
 
-import org.geotools.data.jdbc.datasource.ManageableDataSource;
-import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.jdbc.JDBCDataStoreFactory;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import java.io.File;
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import org.geotools.data.DataStore;
+import org.geotools.data.jdbc.datasource.ManageableDataSource;
+import org.geotools.jdbc.JDBCDataStore;
+import org.geotools.jdbc.JDBCDataStoreFactory;
+import org.h2.tools.Server;
+import org.junit.jupiter.api.Assumptions;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+public class H2GISDataStoreFactoryTest {
+    static H2GISDataStoreFactory factory;
+    static Map<String, Object> params;
 
-/**
- * 
- *
- */
-public class H2GISDataStoreFactoryTest  {
-    private static H2GISDataStoreFactory factory;
-    private static HashMap params;
-    
     @BeforeAll
     static void setUp() {
         factory = new H2GISDataStoreFactory();
-        factory.setBaseDirectory(new File("./target/testH2"));
-        params = new HashMap();
+        params = new HashMap<>();
         params.put(JDBCDataStoreFactory.NAMESPACE.key, "http://www.geotools.org/test");
-        params.put(JDBCDataStoreFactory.DATABASE.key, "h2gis");
+        params.put(JDBCDataStoreFactory.DATABASE.key, "geotools");
         params.put(JDBCDataStoreFactory.DBTYPE.key, "h2gis");
     }
 
     @Test
-    void testCanProcess() {
-        assertFalse(factory.canProcess(Collections.EMPTY_MAP));
+    public void testCanProcess() {
+        assertFalse(factory.canProcess(Collections.emptyMap()));
         assertTrue(factory.canProcess(params));
     }
-    
-    @Test
-    void testCreateDataStore() throws Exception {
-        JDBCDataStore ds = factory.createDataStore( params );
-        assertNotNull( ds );
-        assertTrue(ds.getDataSource() instanceof ManageableDataSource);
-    }
 
     @Test
-    void testCreateH2GIS() throws Exception {
-        Map params = new java.util.HashMap();
-        params.put("database", new File("./target/testH2", "h2gis").getAbsolutePath());
-        params.put("dbtype", "h2gis");
-        H2GISDataStoreFactory ds = new H2GISDataStoreFactory();
-        ds.createDataStore(params);
-        assertNotNull( ds );
-    }
-
-    
-    /*@Test Doesn't work yet
-    public void testTCP() throws Exception {
-        HashMap params = new HashMap();
-        params.put(H2GISDataStoreFactory.HOST.key, "localhost");
-        params.put(H2GISDataStoreFactory.DATABASE.key, "geotools");
-        params.put(H2GISDataStoreFactory.USER.key, "h2gis");
-        params.put(H2GISDataStoreFactory.PASSWD.key, "h2gis");
-        
-        DataStore ds = factory.createDataStore(params);
+    public void testCreateDataStore() throws Exception {
+        JDBCDataStore ds = null;
         try {
-            ds.getTypeNames();
-            fail("Should not have made a connection.");
+            ds = factory.createDataStore(params);
+            assertNotNull(ds);
+            assertTrue(ds.getDataSource() instanceof ManageableDataSource);
+        } finally {
+            if (ds != null) {
+                ds.dispose();
+            }
         }
-        catch(Exception ok) {}
-        
-        Server server = Server.createTcpServer(new String[]{"-baseDir", "target"});
+    }
+
+    @Disabled // TODO : FIXME
+    @Test
+    public void testTCP() throws Exception {
+        // will fail on GitHub linux build, due to TCP port opening
+        Assumptions.assumeFalse(Boolean.getBoolean("linux-github-build"));
+
+        Map<String, Object> params = new HashMap<>();
+        params.put(H2GISDataStoreFactory.HOST.key, "localhost");
+        params.put(H2GISDataStoreFactory.DATABASE.key, "~/geotools");
+        params.put(H2GISDataStoreFactory.USER.key, "geotools");
+        params.put(H2GISDataStoreFactory.PASSWD.key, "geotools");
+
+        DataStore ds = null;
+        try {
+            ds = factory.createDataStore(params);
+            try {
+                ds.getTypeNames();
+                fail("Should not have made a connection.");
+            } catch (Exception ok) {
+            }
+        } finally {
+            if (ds != null) {
+                ds.dispose();
+            }
+        }
+
+        Server server = Server.createTcpServer(new String[] {"-baseDir", "target"});
         server.start();
         try {
-            while(!server.isRunning(false)) {
+            while (!server.isRunning(false)) {
                 Thread.sleep(100);
             }
-            
-            ds = factory.createDataStore(params);
-            ds.getTypeNames();
-        }
-        finally {
+            ds = null;
+            try {
+                ds = factory.createDataStore(params);
+                ds.getTypeNames();
+            } finally {
+                if (ds != null) {
+                    ds.dispose();
+                }
+            }
+        } finally {
             server.shutdown();
         }
-    }*/
+    }
+
+    @Test
+    public void testDefaultFetchSizeDataStore() throws Exception {
+        JDBCDataStore ds = null;
+        try {
+            assertNull(params.get(H2GISDataStoreFactory.FETCHSIZE.key));
+            ds = factory.createDataStore(params);
+            assertNotNull(ds);
+            assertEquals(1000, ds.getFetchSize());
+        } finally {
+            if (ds != null) {
+                ds.dispose();
+            }
+        }
+    }
 }

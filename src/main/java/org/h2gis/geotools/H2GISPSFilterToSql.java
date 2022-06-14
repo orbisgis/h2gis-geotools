@@ -19,7 +19,6 @@ package org.h2gis.geotools;
 import java.io.IOException;
 import org.geotools.filter.FilterCapabilities;
 import org.geotools.jdbc.PreparedFilterToSQL;
-import org.opengis.feature.type.GeometryDescriptor;
 import org.opengis.filter.expression.Expression;
 import org.opengis.filter.expression.Function;
 import org.opengis.filter.expression.Literal;
@@ -29,17 +28,18 @@ import org.opengis.filter.spatial.DistanceBufferOperator;
 
 public class H2GISPSFilterToSql extends PreparedFilterToSQL {
 
-    H2GISFilterToSQLHelper helper;
-    boolean functionEncodingEnabled;
+    private final H2GISFilterToSQLHelper helper;
+    private boolean functionEncodingEnabled;
 
     public H2GISPSFilterToSql(H2GISPSDialect dialect) {
         super(dialect);
         helper = new H2GISFilterToSQLHelper(this);
-    }   
+    }
 
     @Override
     protected FilterCapabilities createFilterCapabilities() {
-        return helper.createFilterCapabilities(functionEncodingEnabled);
+        return H2GISFilterToSQLHelper.createFilterCapabilities(
+                functionEncodingEnabled, super.createFilterCapabilities());
     }
 
     @Override
@@ -60,17 +60,13 @@ public class H2GISPSFilterToSql extends PreparedFilterToSQL {
         return helper.visitBinarySpatialOperator(filter, e1, e2, extraData);
     }
 
-    GeometryDescriptor getCurrentGeometry() {
-        return currentGeometry;
-    }
-
     public void setFunctionEncodingEnabled(boolean functionEncodingEnabled) {
         this.functionEncodingEnabled = functionEncodingEnabled;
     }
 
     @Override
     protected String getFunctionName(Function function) {
-        return helper.getFunctionName(function);
+        return H2GISFilterToSQLHelper.getFunctionName(function);
     }
 
     @Override
@@ -99,5 +95,5 @@ public class H2GISPSFilterToSql extends PreparedFilterToSQL {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }   
+    }
 }

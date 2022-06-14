@@ -1,10 +1,10 @@
 /*
- * h2gis-geotools is an extension to the geotools library to connect H2GIS a 
+ * h2gis-geotools is an extension to the geotools library to connect H2GIS a
  * spatial library that brings spatial support to the H2 Java database. *
  *
  * Copyright (C) 2017 LAB-STICC CNRS UMR 6285
  *
- * h2gis-geotools is free software; 
+ * h2gis-geotools is free software;
  * you can redistribute it and/or modify it under the terms of the GNU
  * Lesser General Public License as published by the Free Software Foundation;
  * version 3.0 of the License.
@@ -68,33 +68,27 @@ import org.opengis.filter.spatial.Intersects;
 import org.opengis.filter.spatial.Overlaps;
 import org.opengis.filter.spatial.Touches;
 import org.opengis.filter.spatial.Within;
-/**
- * 
- * @author Erwan Bocher
- */
+
+/** @author Erwan Bocher */
 public class H2GISFilterToSQLHelper {
 
-    
     FilterToSQL filterToSQL;
     Writer out;
 
-    /**
-     * 
-     * @param filterToSQL 
-     */
+    /** @param filterToSQL */
     public H2GISFilterToSQLHelper(FilterToSQL filterToSQL) {
         this.filterToSQL = filterToSQL;
     }
 
     /**
-     * 
      * @param encodeFunctions
-     * @return 
+     * @return
      */
-    public static FilterCapabilities createFilterCapabilities(boolean encodeFunctions) {
-        FilterCapabilities caps = new FilterCapabilities();
+    public static FilterCapabilities createFilterCapabilities(
+            boolean encodeFunctions, FilterCapabilities superCaps) {
+        FilterCapabilities caps = superCaps;
         caps.addAll(SQLDialect.BASE_DBMS_CAPABILITIES);
-        //adding the spatial filters support
+        // adding the spatial filters support
         caps.addType(BBOX.class);
         caps.addType(Contains.class);
         caps.addType(Crosses.class);
@@ -135,24 +129,25 @@ public class H2GISFilterToSQLHelper {
     }
 
     /**
-     * 
      * @param filter
      * @param property
      * @param geometry
      * @param swapped
      * @param extraData
-     * @return 
+     * @return
      */
-    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter,
-            PropertyName property, Literal geometry, boolean swapped,
+    protected Object visitBinarySpatialOperator(
+            BinarySpatialOperator filter,
+            PropertyName property,
+            Literal geometry,
+            boolean swapped,
             Object extraData) {
         try {
             if (filter instanceof DistanceBufferOperator) {
-                visitDistanceSpatialOperator((DistanceBufferOperator) filter,
-                        property, geometry, swapped, extraData);
+                visitDistanceSpatialOperator(
+                        (DistanceBufferOperator) filter, property, geometry, swapped, extraData);
             } else {
-                visitComparisonSpatialOperator(filter, property, geometry,
-                        swapped, extraData);
+                visitComparisonSpatialOperator(filter, property, geometry, swapped, extraData);
             }
         } catch (IOException e) {
             throw new RuntimeException("Cannot create this spatial filter", e);
@@ -161,15 +156,14 @@ public class H2GISFilterToSQLHelper {
     }
 
     /**
-     * 
      * @param filter
      * @param e1
      * @param e2
      * @param extraData
-     * @return 
+     * @return
      */
-    protected Object visitBinarySpatialOperator(BinarySpatialOperator filter, Expression e1,
-            Expression e2, Object extraData) {
+    protected Object visitBinarySpatialOperator(
+            BinarySpatialOperator filter, Expression e1, Expression e2, Object extraData) {
         try {
             visitBinarySpatialOperator(filter, e1, e2, false, extraData);
         } catch (IOException e) {
@@ -179,19 +173,21 @@ public class H2GISFilterToSQLHelper {
     }
 
     /**
-     * 
      * @param filter
      * @param property
      * @param geometry
      * @param swapped
      * @param extraData
-     * @throws IOException 
+     * @throws IOException
      */
-   private void visitDistanceSpatialOperator(DistanceBufferOperator filter,
-            PropertyName property, Literal geometry, boolean swapped,
-            Object extraData) throws IOException {
-        if ((filter instanceof DWithin && !swapped)
-                || (filter instanceof Beyond && swapped)) {
+    private void visitDistanceSpatialOperator(
+            DistanceBufferOperator filter,
+            PropertyName property,
+            Literal geometry,
+            boolean swapped,
+            Object extraData)
+            throws IOException {
+        if ((filter instanceof DWithin && !swapped) || (filter instanceof Beyond && swapped)) {
             out.write("ST_DWithin(");
             property.accept(filterToSQL, extraData);
             out.write(",");
@@ -200,8 +196,7 @@ public class H2GISFilterToSQLHelper {
             out.write(String.valueOf(filter.getDistance()));
             out.write(")");
         }
-        if ((filter instanceof DWithin && swapped)
-                || (filter instanceof Beyond && !swapped)) {
+        if ((filter instanceof DWithin && swapped) || (filter instanceof Beyond && !swapped)) {
             out.write("ST_Distance(");
             property.accept(filterToSQL, extraData);
             out.write(",");
@@ -211,9 +206,7 @@ public class H2GISFilterToSQLHelper {
         }
     }
 
-   
     /**
-     *
      * @param filter
      * @param property
      * @param geometry
@@ -221,34 +214,43 @@ public class H2GISFilterToSQLHelper {
      * @param extraData
      * @throws IOException
      */
-    private void visitComparisonSpatialOperator(BinarySpatialOperator filter,
-            PropertyName property, Literal geometry, boolean swapped, Object extraData)
+    private void visitComparisonSpatialOperator(
+            BinarySpatialOperator filter,
+            PropertyName property,
+            Literal geometry,
+            boolean swapped,
+            Object extraData)
             throws IOException {
         // add && filter if possible
         if (!(filter instanceof Disjoint)) {
             property.accept(filterToSQL, extraData);
             out.write(" && ");
             geometry.accept(filterToSQL, extraData);
-         // if we're just encoding a bbox in loose mode, we're done
+            // if we're just encoding a bbox in loose mode, we're done
             if (filter instanceof BBOX) {
                 return;
             }
             out.write(" AND ");
         }
-        visitBinarySpatialOperator(filter, (Expression) property, (Expression) geometry, swapped, extraData);
+        visitBinarySpatialOperator(
+                filter, (Expression) property, (Expression) geometry, swapped, extraData);
     }
 
     /**
-     * 
      * @param filter
      * @param e1
      * @param e2
      * @param swapped
      * @param extraData
-     * @throws IOException 
+     * @throws IOException
      */
-    private void visitBinarySpatialOperator(BinarySpatialOperator filter, Expression e1, Expression e2,
-            boolean swapped, Object extraData) throws IOException {
+    private void visitBinarySpatialOperator(
+            BinarySpatialOperator filter,
+            Expression e1,
+            Expression e2,
+            boolean swapped,
+            Object extraData)
+            throws IOException {
         String closingParenthesis = ")";
         if (filter instanceof Equals) {
             out.write("ST_Equals");
@@ -285,8 +287,6 @@ public class H2GISFilterToSQLHelper {
         out.write(closingParenthesis);
     }
 
-   
-
     /**
      * Maps a function to its native db equivalent
      *
@@ -312,8 +312,8 @@ public class H2GISFilterToSQLHelper {
     }
 
     /**
-     * Performs custom visits for functions that cannot be encoded as
-     * <code>functionName(p1, p2, ... pN).</code>
+     * Performs custom visits for functions that cannot be encoded as <code>
+     * functionName(p1, p2, ... pN).</code>
      *
      * @param function
      * @param extraData
@@ -406,30 +406,32 @@ public class H2GISFilterToSQLHelper {
     }
 
     /**
-     * 
      * @param function
      * @param idx
      * @param mandatory
-     * @return 
+     * @return
      */
     private Expression getParameter(Function function, int idx, boolean mandatory) {
         final List<Expression> params = function.getParameters();
         if (params == null || params.size() <= idx) {
             if (mandatory) {
-                throw new IllegalArgumentException("Missing parameter number " + (idx + 1)
-                        + "for function " + function.getName() + ", cannot encode in SQL");
+                throw new IllegalArgumentException(
+                        "Missing parameter number "
+                                + (idx + 1)
+                                + "for function "
+                                + function.getName()
+                                + ", cannot encode in SQL");
             }
         }
         return params.get(idx);
     }
 
     /**
-     * 
      * @param property
      * @param target
-     * @return 
+     * @return
      */
-    public String cast(String property, Class target) {
+    public String cast(String property, Class<?> target) {
         if (String.class.equals(target)) {
             return property + "::varchar";
         } else if (Short.class.equals(target) || Byte.class.equals(target)) {
@@ -446,8 +448,6 @@ public class H2GISFilterToSQLHelper {
             return property + "::numeric";
         } else if (BigDecimal.class.equals(target)) {
             return property + "::decimal";
-        } else if (Double.class.equals(target)) {
-            return property + "::float8";
         } else if (Time.class.isAssignableFrom(target)) {
             return property + "::time";
         } else if (Timestamp.class.isAssignableFrom(target)) {
