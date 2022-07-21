@@ -431,7 +431,9 @@ class H2GISTest extends H2GISTestSetup {
         query = new Query(schema.getName().getLocalPart(), Filter.INCLUDE);
         ReferencedEnvelope bounds = fs.getBounds(query);
         assertNotNull(bounds);
-        assertEquals("ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0] DefaultGeographicCRS[EPSG:WGS 84] AXIS[\"Geodetic latitude\", NORTH] AXIS[\"Geodetic longitude\", EAST]", bounds.toString());
+        assertEquals(
+                "ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0] DefaultGeographicCRS[EPSG:WGS 84] AXIS[\"Geodetic latitude\", NORTH] AXIS[\"Geodetic longitude\", EAST]",
+                bounds.toString());
         st.execute("drop table LANDCOVER");
     }
 

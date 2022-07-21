@@ -64,7 +64,7 @@ public class H2GISDataStoreFactoryTest {
         }
     }
 
-    @Disabled // TODO to be fixed
+    @Disabled // TODO : FIXME
     @Test
     public void testTCP() throws Exception {
         // will fail on GitHub linux build, due to TCP port opening
