@@ -29,7 +29,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
-
 import org.geotools.data.DataUtilities;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
@@ -63,9 +62,7 @@ import org.opengis.filter.spatial.BBOX;
 import org.opengis.filter.spatial.Intersects;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-/**
- * @author Erwan Bocher
- */
+/** @author Erwan Bocher */
 class H2GISTest extends H2GISTestSetup {
 
     private static final String DB_NAME = "H2GISDBTest";
@@ -434,7 +431,7 @@ class H2GISTest extends H2GISTestSetup {
         query = new Query(schema.getName().getLocalPart(), Filter.INCLUDE);
         ReferencedEnvelope bounds = fs.getBounds(query);
         assertNotNull(bounds);
-        assertEquals("ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0]", bounds.toString());
+        assertEquals("ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0] DefaultGeographicCRS[EPSG:WGS 84] AXIS[\"Geodetic latitude\", NORTH] AXIS[\"Geodetic longitude\", EAST]", bounds.toString());
         st.execute("drop table LANDCOVER");
     }
 
