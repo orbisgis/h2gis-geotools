@@ -42,10 +42,7 @@ import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
-import org.geotools.jdbc.JDBCDataStore;
-import org.geotools.jdbc.JDBCDataStoreFactory;
-import org.geotools.jdbc.SQLDialect;
-import org.geotools.jdbc.VirtualTable;
+import org.geotools.jdbc.*;
 import org.geotools.referencing.CRS;
 import org.h2gis.utilities.GeometryTableUtilities;
 import org.h2gis.utilities.TableLocation;
@@ -434,7 +431,9 @@ class H2GISTest extends H2GISTestSetup {
         query = new Query(schema.getName().getLocalPart(), Filter.INCLUDE);
         ReferencedEnvelope bounds = fs.getBounds(query);
         assertNotNull(bounds);
-        assertEquals("ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0]", bounds.toString());
+        assertEquals(
+                "ReferencedEnvelope[90.0 : 310.0, 110.0 : 330.0] DefaultGeographicCRS[EPSG:WGS 84] AXIS[\"Geodetic latitude\", NORTH] AXIS[\"Geodetic longitude\", EAST]",
+                bounds.toString());
         st.execute("drop table LANDCOVER");
     }
 
@@ -556,5 +555,17 @@ class H2GISTest extends H2GISTestSetup {
         assertNotNull(geomDes);
         assertEquals(Polygon.class, geomDes.getType().getBinding());
         st.execute("drop table LANDCOVER");
+    }
+
+    @Test
+    void getPrimaryKeyFromLinkedFile() throws SQLException, IOException {
+        st.execute("drop table if exists LANDCOVER_LINKED");
+        st.execute(
+                "CALL FILE_TABLE('"
+                        + H2GISTest.class.getResource("landcover.shp").getPath()
+                        + "', 'LANDCOVER_LINKED');");
+        SimpleFeatureType schema = ds.getFeatureSource("LANDCOVER_LINKED").getSchema();
+        PrimaryKey pk = ds.getPrimaryKey(schema);
+        System.out.println(pk);
     }
 }

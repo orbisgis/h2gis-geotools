@@ -72,7 +72,7 @@ public class H2GISDataStoreFactoryTest {
 
         Map<String, Object> params = new HashMap<>();
         params.put(H2GISDataStoreFactory.HOST.key, "localhost");
-        params.put(H2GISDataStoreFactory.DATABASE.key, "~/geotools");
+        params.put(H2GISDataStoreFactory.DATABASE.key, "./geotools");
         params.put(H2GISDataStoreFactory.USER.key, "geotools");
         params.put(H2GISDataStoreFactory.PASSWD.key, "geotools");
 

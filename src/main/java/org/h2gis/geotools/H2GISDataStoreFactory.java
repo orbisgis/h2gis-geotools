@@ -35,9 +35,6 @@ import org.geotools.jdbc.JDBCDataStoreFactory;
 import org.geotools.jdbc.SQLDialect;
 import org.geotools.util.KVP;
 import org.geotools.util.logging.Logging;
-import org.h2gis.functions.factory.H2GISFunctions;
-import org.h2gis.utilities.JDBCUtilities;
-import org.h2gis.utilities.TableLocation;
 
 /**
  * DataStoreFactory for H2GIS database.
@@ -227,7 +224,6 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
             } else {
                 location = database;
             }
-
             return "jdbc:h2:file:" + location + autoServerSpec;
         }
     }
@@ -236,8 +232,8 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
     protected DataSource createDataSource(Map<String, ?> params, SQLDialect dialect)
             throws IOException {
         BasicDataSource dataSource = new BasicDataSource();
-        String jdbURL = getJDBCUrl(params);
-        dataSource.setUrl(jdbURL);
+        String jdbcURl = getJDBCUrl(params);
+        dataSource.setUrl(jdbcURl);
         String username = (String) USER.lookUp(params);
         if (username != null) {
             dataSource.setUsername(username);
@@ -250,24 +246,21 @@ public class H2GISDataStoreFactory extends JDBCDataStoreFactory {
         dataSource.setDriverClassName("org.h2.Driver");
         dataSource.setPoolPreparedStatements(false);
 
-        if (!jdbURL.contains("h2:tcp")) {
+        // If the database is running on server mode, the spatial functions cannot be initialized
+        if (!jdbcURl.contains("h2:tcp")) {
             // if we got here the database has been created, now verify it has the H2GIS extension
             // and eventually try to create them
             JDBCDataStore closer = new JDBCDataStore();
             Connection cx = null;
             try {
                 cx = dataSource.getConnection();
-                // Add the spatial function
-                if (!JDBCUtilities.tableExists(cx, new TableLocation("GEOMETRY_COLUMNS"))) {
-                    H2GISFunctions.load(cx);
-                }
+                H2GISDialect.initSpatialFunctions(cx);
             } catch (SQLException e) {
                 throw new IOException("Failed to create the target database", e);
             } finally {
                 closer.closeSafe(cx);
             }
         }
-
         return new DBCPDataSource(dataSource);
     }
 
